@@ -1,0 +1,31 @@
+/* Variables de design — TaskBoard (fictif, usage formation) */
+:root {
+  --color-bg: #FBFBF8;
+  --color-panel: #FFFFFF;
+  --color-border: #DDE3EC;
+  --color-accent: #1B3A5C;
+  --color-accent-2: #2C5C8F;
+  --color-text: #16161B;
+  --color-text-dim: #3c3c46;
+  --color-text-mute: #6b6b76;
+  --color-gold: #B9862E;
+  --color-green: #1E7A46;
+  --color-red: #B23A3A;
+
+  --priority-low: #2C5C8F;
+  --priority-medium: #B9862E;
+  --priority-high: #C9702B;
+  --priority-critical: #B23A3A;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-pill: 20px;
+
+  --font-body: 'Segoe UI', system-ui, sans-serif;
+}

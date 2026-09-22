@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskBoard — Détail de la tâche</title>
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+<header class="app-header">
+  <h1>TaskBoard</h1>
+  <p class="tagline">Codebase d'exercice — formation GitHub Copilot Transactis (aucune donnée réelle)</p>
+  <nav class="app-nav" aria-label="Navigation principale">
+    <a href="index.html">Tableau</a>
+    <a href="task-detail.html" aria-current="page">Détail d'une tâche</a>
+    <a href="about.html">À propos</a>
+  </nav>
+</header>
+
+<main>
+  <a href="index.html" class="btn btn-secondary">← Retour au tableau</a>
+
+  <article class="card" style="max-width: 640px;">
+    <h2 class="card-title">Préparer la codebase d'exercice</h2>
+    <span class="badge" data-priority="critical">Critique</span>
+    <p class="card-description">
+      Construire une version de TaskBoard en HTML, CSS et JavaScript pour
+      l'exercice « 60 étapes GitHub Copilot ». Inclure un fichier de
+      styles volontairement mal écrit et un script JS volontairement
+      incomplet (bug + TODO), à corriger et compléter pendant l'atelier.
+    </p>
+    <dl>
+      <dt>Statut</dt>
+      <dd>En cours</dd>
+      <dt>Échéance</dt>
+      <dd>20/07/2026</dd>
+      <dt>Projet</dt>
+      <dd>TaskBoard</dd>
+    </dl>
+  </article>
+
+  <section aria-labelledby="comments-title">
+    <h2 id="comments-title">Commentaires</h2>
+    <ul>
+      <li>« Bien penser à documenter les variables CSS dans architecture.md. »</li>
+      <li>« Le badge critique devrait être plus visible — à revoir en Étape 4. »</li>
+    </ul>
+  </section>
+</main>
+
+<footer class="app-footer">
+  <p>TaskBoard — projet fictif construit pour la formation GitHub Copilot Transactis. Digital House Company.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskBoard — Tableau des tâches</title>
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/responsive.css">
+<script src="js/app.js" defer></script>
+</head>
+<body>
+<header class="app-header">
+  <h1>TaskBoard</h1>
+  <p class="tagline">Codebase d'exercice — formation GitHub Copilot Transactis (aucune donnée réelle)</p>
+  <nav class="app-nav" aria-label="Navigation principale">
+    <a href="index.html" aria-current="page">Tableau</a>
+    <a href="task-detail.html">Détail d'une tâche</a>
+    <a href="about.html">À propos</a>
+  </nav>
+</header>
+
+<main>
+  <section class="form-panel" aria-labelledby="form-title">
+    <h2 id="form-title">Nouvelle tâche</h2>
+    <form>
+      <label for="title">Titre</label>
+      <input type="text" id="title" name="title" placeholder="Ex. Préparer le support de formation" required>
+
+      <label for="description">Description</label>
+      <textarea id="description" name="description" rows="3" placeholder="Détails (optionnel)"></textarea>
+
+      <label for="priority">Priorité</label>
+      <select id="priority" name="priority">
+        <option value="low">Basse</option>
+        <option value="medium" selected>Moyenne</option>
+        <option value="high">Haute</option>
+        <option value="critical">Critique</option>
+      </select>
+
+      <label for="dueDate">Échéance</label>
+      <input type="date" id="dueDate" name="dueDate">
+
+      <button type="submit" class="btn">Ajouter la tâche</button>
+    </form>
+    <p><em>Formulaire de démonstration : le branchement JS (js/app.js) est volontairement incomplet — c'est une des cibles de l'exercice.</em></p>
+  </section>
+
+  <section class="board" aria-label="Tableau des tâches">
+    <div class="column">
+      <h2>À faire <span class="count">2</span></h2>
+      <div class="cards">
+        <article class="card">
+          <h3 class="card-title">Relire le guide d'exercice</h3>
+          <span class="badge" data-priority="medium">Moyenne</span>
+          <p class="card-description">Vérifier les 10 étapes et les 3 niveaux.</p>
+          <p class="card-due">Échéance : 25/07/2026</p>
+        </article>
+        <article class="card">
+          <h3 class="card-title">Ajouter le filtre par priorité</h3>
+          <span class="badge" data-priority="low">Basse</span>
+          <p class="card-description">Voir Étape 7 du guide (Agent mode).</p>
+          <p class="card-due">Sans échéance</p>
+        </article>
+      </div>
+    </div>
+    <div class="column">
+      <h2>En cours <span class="count">1</span></h2>
+      <div class="cards">
+        <article class="card">
+          <h3 class="card-title">Préparer la codebase d'exercice</h3>
+          <span class="badge" data-priority="critical">Critique</span>
+          <p class="card-description">Construire TaskBoard en HTML/CSS uniquement.</p>
+          <p class="card-due">Échéance : 20/07/2026</p>
+        </article>
+      </div>
+    </div>
+    <div class="column">
+      <h2>Terminé <span class="count">1</span></h2>
+      <div class="cards">
+        <article class="card">
+          <h3 class="card-title">Cadrer le périmètre de la formation</h3>
+          <span class="badge" data-priority="high">Haute</span>
+          <p class="card-description">Lister les objectifs pédagogiques avec le client.</p>
+          <p class="card-due">Sans échéance</p>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="app-footer">
+  <p>TaskBoard — projet fictif construit pour la formation GitHub Copilot Transactis. Digital House Company.</p>
+</footer>
+</body>
+</html>
