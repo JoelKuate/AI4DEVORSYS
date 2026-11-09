@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formation GitHub Copilot : Énoncé</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Palette institutionnelle Urssaf (bleu marine / turquoise) */
+    :root {
+      --bg: #FFFFFF;
+      --fond: #F2F7F7;
+      --carte: #FFFFFF;
+      --card: #EAF4F3;
+      --texte: #16212B;
+      --gris: #4B5C63;
+      --navy: #0B2D48;
+      --navy2: #08202F;
+      --accent: #0E8C86;
+      --principal: #0B6E68;
+      --vert: #1F9D67;
+      --warn: #B9740A;
+      --bad: #C1443B;
+      --bordure: #D7E6E4;
+      --code: #08202F;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--fond);
+      color: var(--texte);
+      line-height: 1.55;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--navy);
+      color: #fff;
+      padding: 16px 20px;
+    }
+    header h1 { margin: 0 0 6px; font-size: 1.35rem; }
+    .progression { font-size: 0.9rem; }
+    .barre { height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px; margin-top: 8px; overflow: hidden; }
+    .barre div { height: 100%; width: 0; background: #fff; transition: width 0.3s; }
+    main { max-width: 860px; margin: 0 auto; padding: 20px 16px 60px; }
+    .carte-info {
+      background: var(--carte);
+      border: 1px solid var(--bordure);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    .carte-info h2 { margin: 0 0 8px; font-size: 1.1rem; color: var(--navy); }
+    .numero { background: var(--accent) !important; }
+    .etape.fait .numero { background: var(--vert) !important; }
+    button { font-family: 'Inter', sans-serif; }
+    code.commande { border-left: 3px solid var(--accent); }
+    .carte-info ul { margin: 6px 0 0; padding-left: 20px; }
+    .outils { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
+    button {
+      background: var(--principal);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    button.secondaire { background: var(--gris); }
+    button.danger { background: var(--bad); }
+    .module {
+      margin: 36px 0 12px;
+      font-size: 1.15rem;
+      color: var(--navy);
+      border-bottom: 2px solid var(--bordure);
+      padding-bottom: 6px;
+    }
+    .module small { color: var(--gris); font-weight: normal; }
+    .etape {
+      background: var(--carte);
+      border: 1px solid var(--bordure);
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-bottom: 14px;
+    }
+    .etape.fait { border-color: var(--vert); }
+    .entete { display: flex; align-items: flex-start; gap: 12px; }
+    .numero {
+      flex: 0 0 auto;
+      background: var(--principal);
+      color: #fff;
+      border-radius: 50%;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+    .titre { margin: 2px 0 0; font-size: 1.05rem; font-weight: 600; flex: 1; }
+    .etape label.check { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--gris); white-space: nowrap; cursor: pointer; }
+    .champ { margin-top: 10px; font-size: 0.93rem; }
+    .champ strong { color: var(--gris); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    .pourquoi { background: var(--card); border-left: 3px solid var(--accent); border-radius: 8px; padding: 10px 12px; color: var(--navy); }
+    .travail { background: #f9fafb; border-radius: 8px; padding: 10px 12px; }
+    code.commande {
+      display: inline-block;
+      background: var(--code);
+      color: #e2e8f0;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.88rem;
+      margin-top: 4px;
+      white-space: pre-wrap;
+    }
+    code.inline { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+    textarea {
+      width: 100%;
+      min-height: 70px;
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px solid var(--bordure);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.93rem;
+      resize: vertical;
+    }
+    .pied-page { text-align: center; color: var(--gris); font-size: 0.85rem; margin-top: 40px; }
+    @media print {
+      header, .outils, .carte-info.aide, textarea { display: none; }
+      .etape textarea { display: block; border: 1px dashed #999; min-height: 40px; }
+      body { background: #fff; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Formation GitHub Copilot dans VS Code : Énoncé participant</h1>
+    <div class="progression"><span id="compte">0</span> / 100 étapes réalisées · Durée indicative : 7 h</div>
+    <div class="barre"><div id="barre-progression"></div></div>
+  </header>
+
+  <main>
+    <section class="carte-info">
+      <h2>Comment travailler</h2>
+      <p>Cette formation vous fait construire l'environnement Copilot complet autour d'une seule base de code : <code class="inline">code/</code>, une petite application de liste de tâches. Chaque module suit la même logique :</p>
+      <ul>
+        <li><strong>Pourquoi</strong> : ce que la fonctionnalité résout, et quand l'utiliser.</li>
+        <li><strong>Commande ou raccourci</strong> : ce que vous tapez ou cliquez.</li>
+        <li><strong>Travail à faire</strong> : l'exercice, toujours appliqué aux fichiers de <code class="inline">code/</code>.</li>
+        <li><strong>Résultat attendu</strong> : ce que vous devez obtenir pour valider l'étape.</li>
+      </ul>
+      <p>Notez vos observations dans la zone de texte, cochez « Fait », et passez à l'étape suivante. Votre progression est enregistrée dans ce navigateur ; l'export produit un fichier <code class="inline">.txt</code>.</p>
+      <p><em>Remarque :</em> les raccourcis sont donnés pour Windows. Les menus, noms de fichiers de configuration et commandes CLI évoluent selon les versions de VS Code et de Copilot. En cas d'écart, vérifiez dans la palette de commandes (<code class="inline">Ctrl+Shift+P</code>, taper « Copilot ») et dans la documentation officielle GitHub Copilot.</p>
+      <div class="outils">
+        <button id="btn-export">Exporter mes notes (.txt)</button>
+        <button id="btn-replier" class="secondaire">Replier / déplier les notes</button>
+        <button id="btn-reset" class="danger">Réinitialiser ma progression</button>
+      </div>
+    </section>
+
+    <div id="contenu"></div>
+
+    <section class="carte-info aide">
+      <h2>Aide-mémoire : où vit chaque élément de Copilot</h2>
+      <ul>
+        <li><code class="inline">.github/copilot-instructions.md</code> : instructions globales du dépôt</li>
+        <li><code class="inline">.github/instructions/*.instructions.md</code> : instructions ciblées par type de fichier (<code class="inline">applyTo</code>)</li>
+        <li><code class="inline">AGENTS.md</code> : instructions lues par les agents, à la racine</li>
+        <li><code class="inline">.github/prompts/*.prompt.md</code> : prompts réutilisables, appelés avec <code class="inline">/nom</code></li>
+        <li><code class="inline">.github/agents/*.agent.md</code> : agents personnalisés (rôle, outils, modèle)</li>
+        <li><code class="inline">.github/skills/&lt;nom&gt;/SKILL.md</code> : compétences réutilisables</li>
+        <li><code class="inline">.vscode/mcp.json</code> : serveurs MCP (outils externes)</li>
+      </ul>
+      <p><strong>Chat :</strong> <code class="inline">/explain</code> <code class="inline">/fix</code> <code class="inline">/tests</code> <code class="inline">/doc</code> <code class="inline">/clear</code> <code class="inline">/help</code> · <strong>Participants :</strong> <code class="inline">@workspace</code> <code class="inline">@terminal</code> <code class="inline">@vscode</code> <code class="inline">@github</code> · <strong>Variables :</strong> <code class="inline">#file</code> <code class="inline">#selection</code> <code class="inline">#codebase</code> <code class="inline">#editor</code> <code class="inline">#problems</code> <code class="inline">#fetch</code> <code class="inline">#terminalLastCommand</code></p>
+      <p><strong>Clavier (Windows) :</strong> <code class="inline">Tab</code> accepter · <code class="inline">Esc</code> rejeter · <code class="inline">Ctrl+Droite</code> mot par mot · <code class="inline">Alt+]</code> / <code class="inline">Alt+[</code> alternatives · <code class="inline">Ctrl+Entrée</code> panneau de complétions · <code class="inline">Ctrl+Alt+I</code> chat · <code class="inline">Ctrl+I</code> chat inline</p>
+    </section>
+
+    <p class="pied-page">100 étapes · 15 modules · 7 h (400 min de travail + 20 min de pauses)</p>
+  </main>
+
+  <script>
+    const MODULES = [
+      { id: 1, titre: "Comprendre la codebase avec Copilot", duree: "35 min" },
+      { id: 2, titre: "Complétions inline", duree: "25 min" },
+      { id: 3, titre: "Copilot Chat : panneau et slash commands", duree: "40 min" },
+      { id: 4, titre: "Participants et variables de contexte", duree: "35 min" },
+      { id: 5, titre: "Édition assistée : Ctrl+I et Next Edit Suggestions", duree: "20 min" },
+      { id: 6, titre: "Tests, documentation, refactoring et correction de bugs", duree: "35 min" },
+      { id: 7, titre: "Modes Ask, Edit et Agent", duree: "20 min" },
+      { id: 8, titre: "Instructions personnalisées", duree: "25 min" },
+      { id: 9, titre: "Prompt files (prompts réutilisables)", duree: "20 min" },
+      { id: 10, titre: "Agents personnalisés (custom agents)", duree: "40 min" },
+      { id: 11, titre: "Agent skills (compétences)", duree: "20 min" },
+      { id: 12, titre: "Serveurs MCP (outils externes)", duree: "25 min" },
+      { id: 13, titre: "Paramètres et gouvernance", duree: "15 min" },
+      { id: 14, titre: "Git et GitHub : coding agent et revue de code", duree: "25 min" },
+      { id: 15, titre: "Copilot CLI et bilan", duree: "20 min" }
+    ];
+
+    // m = module, t = titre, p = pourquoi, c = commande ou raccourci, d = travail à faire, a = résultat attendu
+    const ETAPES = [
+      // ---------- MODULE 1 : Comprendre la codebase (1 à 8) ----------
+      { m: 1, t: "Cartographier le projet avec @workspace", p: "Avant de demander du code, il faut comprendre le projet. @workspace lit l'ensemble du workspace ouvert et répond en s'appuyant sur les vrais fichiers.", c: "@workspace décris l'architecture de ce projet : fichiers, rôle de chacun", d: "Copiez la réponse dans vos notes. Ouvrez chaque fichier cité et vérifiez qu'il existe bien.", a: "La réponse cite index.html, css/style.css, js/utils.js, js/app.js et tests/. Aucune invention de fichier." },
+      { m: 1, t: "Ancrer une question sur un fichier avec #file", p: "#file limite la réponse à un fichier précis. C'est le meilleur moyen de réduire les réponses hors sujet.", c: "#file:js/app.js explique où et comment les données sont sauvegardées", d: "Identifiez la clé utilisée pour localStorage et les fonctions concernées.", a: "La réponse indique la clé « taches », chargerTaches() et sauvegarder()." },
+      { m: 1, t: "Chercher un usage dans tout le projet avec #codebase", p: "#codebase fait une recherche sur l'ensemble du projet. Utile pour savoir qui utilise une fonction avant de la modifier.", c: "#codebase où est utilisée la fonction Utils.countDone ?", d: "Notez chaque appel trouvé et le fichier concerné.", a: "L'appel dans js/app.js (fonction afficher) est cité." },
+      { m: 1, t: "Expliquer une fonction avec /explain", p: "/explain transforme du code en explication. Attention : une explication peut être fausse, il faut la vérifier.", c: "Sélectionner la fonction afficher() dans app.js, puis taper /explain", d: "Reformulez l'explication en trois phrases dans vos notes. Vérifiez une affirmation en lisant le code.", a: "L'explication décrit la boucle de rendu et la mise à jour du compteur." },
+      { m: 1, t: "Demander un format de réponse structuré", p: "Plus le format est précis, plus la réponse est exploitable. Un tableau force Copilot à être exhaustif.", c: "#file:js/utils.js liste les risques (bugs, cas limites) dans un tableau : fonction | risque | gravité", d: "Gardez le tableau dans vos notes.", a: "Un tableau à 3 colonnes. isValidTitle et countDone doivent apparaître." },
+      { m: 1, t: "Repérer les comportements non testés", p: "Les tests définissent ce que le projet doit faire. Ce qui n'est pas testé est une zone de risque.", c: "@workspace quels comportements sont couverts par tests/utils.test.js et lesquels ne le sont pas ?", d: "Listez trois manques de couverture. Vous les réutiliserez au module 6.", a: "Au moins trois comportements non testés (ex. suppression, filtres, sauvegarde)." },
+      { m: 1, t: "Lancer les tests et lire un échec", p: "Lire un message d'erreur est la première compétence de débogage. Copilot l'explique bien, mais il faut savoir ce qu'il dit.", c: "Terminal dans code/ : npm test", d: "Notez les tests en échec et le message de chaque erreur.", a: "8 tests passent, 2 échouent : isValidTitle et countDone." },
+      { m: 1, t: "Demander un plan sans modifier le code", p: "En mode question, Copilot réfléchit sans toucher aux fichiers. C'est la bonne manière de cadrer une tâche.", c: "Mode Ask : « Propose un plan en 5 étapes pour ajouter un filtre par mot-clé. Ne modifie aucun fichier. »", d: "Validez ou corrigez le plan dans vos notes.", a: "Un plan en 5 étapes et aucun fichier modifié." },
+
+      // ---------- MODULE 2 : Complétions inline (9 à 15) ----------
+      { m: 2, t: "Première suggestion inline", p: "Les complétions suivent le contexte du fichier. Elles accélèrent l'écriture répétitive.", c: "Créer code/exercices/pratique.js. Taper « // filtre les tâches par mot-clé » puis Entrée.", d: "Attendez la suggestion et notez ce qu'elle propose avant d'agir.", a: "Un texte gris apparaît sous le curseur." },
+      { m: 2, t: "Accepter ou rejeter une suggestion", p: "Le flux de base : on accepte ce qui est juste, on rejette le reste. Ne jamais accepter sans lire.", c: "Tab pour accepter · Esc pour rejeter", d: "Testez cinq suggestions. Notez combien vous acceptez et pourquoi.", a: "Un petit tableau de comptage dans vos notes." },
+      { m: 2, t: "Parcourir les alternatives", p: "Copilot propose souvent plusieurs variantes. Comparer permet de choisir la plus claire.", c: "Alt+] pour la suivante · Alt+[ pour la précédente", d: "Comparez deux variantes d'une même suggestion et choisissez-en une.", a: "Deux propositions différentes sont visibles." },
+      { m: 2, t: "Accepter mot par mot", p: "Accepter par petits morceaux permet de garder le contrôle sur le code généré.", c: "Ctrl+Droite", d: "Acceptez une suggestion de ligne en plusieurs fois.", a: "Le code s'insère progressivement." },
+      { m: 2, t: "Ouvrir le panneau de complétions", p: "Le panneau montre plusieurs propositions en même temps, utile pour un choix réfléchi.", c: "Ctrl+Entrée", d: "Sur une signature de fonction, choisissez une variante et justifiez votre choix.", a: "Une liste de variantes est affichée." },
+      { m: 2, t: "Compléter une fonction de filtrage", p: "Copilot tient compte des noms de paramètres. Un bon nom de fonction donne une meilleure complétion.", c: "Dans pratique.js, taper : function filtrerParMotCle(taches, motCle) {", d: "Acceptez la suggestion puis vérifiez : la recherche est-elle insensible à la casse ?", a: "Le corps utilise filter(). Vous avez noté si la casse est gérée." },
+      { m: 2, t: "Désactiver Copilot pour un type de fichier", p: "Certains fichiers ne doivent pas recevoir de suggestions (textes, données sensibles). Savoir le désactiver est une question de contrôle.", c: "Icône Copilot dans la barre d'état → désactiver pour un langage (ex. plaintext)", d: "Créer un fichier notes.txt et vérifier qu'aucune suggestion n'apparaît. Réactiver ensuite.", a: "Aucune suggestion dans notes.txt, suggestions de nouveau actives dans .js." },
+
+      // ---------- MODULE 3 : Chat (16 à 25) ----------
+      { m: 3, t: "Ouvrir le chat et choisir un modèle", p: "Le modèle change la vitesse, le coût et la qualité. Il n'existe pas un modèle idéal pour toutes les tâches.", c: "Ctrl+Alt+I puis sélecteur de modèle", d: "Posez la même question à deux modèles différents et notez la différence.", a: "Deux réponses comparées dans vos notes." },
+      { m: 3, t: "Découvrir les commandes avec /help", p: "La liste des commandes dépend de la version installée. /help donne la réponse officielle de votre environnement.", c: "/help", d: "Notez cinq commandes et leur usage.", a: "Cinq commandes notées." },
+      { m: 3, t: "Expliquer isValidTitle avec /explain", p: "Expliquer avant de corriger évite de corriger un faux problème.", c: "Sélectionner isValidTitle dans js/utils.js, puis /explain", d: "Vérifiez l'explication ligne par ligne contre le code.", a: "Vous identifiez si l'explication est exacte." },
+      { m: 3, t: "Corriger avec /fix", p: "/fix propose une correction sous forme de diff. Vous êtes responsable de l'accepter ou non.", c: "Sélectionner isValidTitle puis /fix", d: "Lisez le diff. Acceptez ou annulez, puis justifiez.", a: "Une modification présentée, décision justifiée." },
+      { m: 3, t: "Documenter avec /doc", p: "Une documentation à jour facilite la relecture et les tests.", c: "Sélectionner sumArray puis /doc", d: "Insérez le bloc JSDoc au-dessus de la fonction.", a: "Un bloc /** ... */ est présent." },
+      { m: 3, t: "Générer des tests avec /tests", p: "/tests part du comportement réel de la fonction. Il faut vérifier que les cas sont pertinents.", c: "Sélectionner formatDate puis /tests", d: "Gardez les cas pertinents, retirez les autres.", a: "Des tests proposés, dont vous avez choisi une partie." },
+      { m: 3, t: "Poser une question de suivi", p: "Le chat garde l'historique : une question courte peut s'appuyer sur la réponse précédente.", c: "« Et si la date passée est invalide ? »", d: "Vérifiez que la réponse reprend le contexte précédent.", a: "La réponse se réfère à formatDate sans qu'on la nomme." },
+      { m: 3, t: "Repartir d'un contexte vide", p: "Un historique trop long mélange les sujets. /clear garantit un point de départ propre.", c: "/clear puis reposer la question précédente sans contexte", d: "Comparez la réponse avec celle de l'étape 22.", a: "La réponse est différente ou plus générique." },
+      { m: 3, t: "Joindre un fichier comme contexte", p: "Joindre un fichier donne à Copilot ce qu'il doit lire, sans recopier le code dans le chat.", c: "Glisser index.html dans le chat (Add Context)", d: "Demandez quels ids HTML sont utilisés par js/app.js et s'ils existent tous dans index.html.", a: "Une liste d'ids, avec vérification." },
+      { m: 3, t: "Insérer une réponse dans l'éditeur", p: "Une réponse de chat ne sert que si elle entre dans le code. Insérer proprement évite les copier-coller hasardeux.", c: "Bouton Insert at Cursor (ou copier-coller)", d: "Demandez un exemple d'usage de Utils.capitalize et insérez-le dans pratique.js.", a: "Le code est inséré à la position du curseur." },
+
+      // ---------- MODULE 4 : Participants et variables (26 à 35) ----------
+      { m: 4, t: "Participant @workspace", p: "@workspace cherche dans tout le projet. Il est idéal pour localiser une logique.", c: "@workspace où est défini le rendu de la liste de tâches ?", d: "Ouvrez le fichier cité et confirmez.", a: "La réponse cite afficher() dans js/app.js." },
+      { m: 4, t: "Variable #file", p: "#file restreint le contexte à un seul fichier : plus précis, moins coûteux.", c: "#file:js/app.js explique la fonction ajouterTache", d: "Vérifiez que la réponse ne parle que de app.js.", a: "Explication limitée à app.js." },
+      { m: 4, t: "Variable #selection", p: "Sélectionner un bloc et l'envoyer est la façon la plus rapide de demander une amélioration ciblée.", c: "Sélectionner la boucle de rendu puis « #selection simplifie ce code »", d: "Comparez la version simplifiée à l'originale et gardez la meilleure.", a: "La proposition ne concerne que la sélection." },
+      { m: 4, t: "Variable #editor", p: "#editor utilise le fichier ouvert, sans avoir à le nommer.", c: "#editor quels sont les points faibles de ce fichier ?", d: "Notez deux points faibles et vérifiez-les.", a: "Deux points faibles vérifiés dans le code." },
+      { m: 4, t: "Variable #codebase", p: "#codebase répond aux questions de type « où est utilisé... ». Il faut ensuite contrôler la réponse.", c: "#codebase liste les fonctions exportées par utils.js et leur usage", d: "Comparez la liste avec le fichier réel.", a: "Les fonctions de utils.js sont listées et correctes." },
+      { m: 4, t: "Participant @terminal", p: "@terminal permet de poser une question sur le terminal et son contexte, sans quitter le chat.", c: "@terminal quelle version de Node.js est installée ?", d: "Comparez avec la sortie de node -v.", a: "La réponse correspond à la version affichée." },
+      { m: 4, t: "Variable #terminalLastCommand", p: "Expliquer la dernière erreur du terminal est un gain de temps réel.", c: "Lancer une commande inexistante (ex. npm rien) puis « #terminalLastCommand explique l'erreur »", d: "Lisez l'explication et la correction proposée. Ne la lancez pas sans comprendre.", a: "L'erreur est expliquée et une correction est proposée." },
+      { m: 4, t: "Variable #problems", p: "L'onglet Problems liste les erreurs de l'éditeur. #problems permet de les traiter en lot.", c: "Ouvrir l'onglet Problems puis « #problems corrige ces erreurs »", d: "Corrigez les erreurs de pratique.js et relancez npm test.", a: "Les problèmes diminuent, les tests restent verts." },
+      { m: 4, t: "Participant @vscode", p: "@vscode répond aux questions sur VS Code lui-même : paramètres, raccourcis, commandes.", c: "@vscode comment ouvrir les paramètres d'un seul langage ?", d: "Appliquez la méthode sur le langage JavaScript.", a: "Paramètre modifié via l'interface." },
+      { m: 4, t: "Variable #fetch et documentation externe", p: "#fetch permet d'ajouter une documentation externe au contexte. Vérifiez toujours la source.", c: "#fetch https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/filter résume la méthode et donne un exemple", d: "Appliquez cet exemple à tachesFiltrees() dans app.js sans le copier aveuglément.", a: "Un exemple de filter adapté, vérifié." },
+
+      // ---------- MODULE 5 : Ctrl+I et Next Edit Suggestions (36 à 41) ----------
+      { m: 5, t: "Chat inline sur une ligne vide", p: "Ctrl+I génère le code directement dans l'éditeur, sans passer par le panneau de chat.", c: "Ctrl+I dans pratique.js : « crée une fonction inverserChaine(texte) »", d: "Acceptez, puis testez la fonction avec une valeur d'exemple.", a: "La fonction fonctionne sur au moins un exemple." },
+      { m: 5, t: "Accepter ou rejeter une proposition inline", p: "Une proposition inline se garde ou se rejette comme une suggestion. Rejeter est une décision normale.", c: "Accept (ou Ctrl+Entrée selon version) · Discard ou Esc", d: "Générez une seconde proposition et rejetez-la.", a: "Le fichier revient à son état précédent après rejet." },
+      { m: 5, t: "Transformer une sélection", p: "Ctrl+I sur une sélection cible précisément le code à changer.", c: "Sélectionner la boucle de sumArray puis Ctrl+I : « transforme en reduce »", d: "Relisez le résultat. Le comportement doit rester identique.", a: "Une version avec reduce, même résultat qu'avant." },
+      { m: 5, t: "Ajouter une validation", p: "Demander une validation explicite améliore la robustesse sans modifier la logique métier.", c: "Sélectionner sumArray puis Ctrl+I : « lève une erreur si l'argument n'est pas un tableau »", d: "Testez avec une valeur invalide.", a: "Une erreur est levée pour une entrée non valide." },
+      { m: 5, t: "Next Edit Suggestions", p: "Après une modification, Copilot peut proposer la modification suivante ailleurs dans le fichier. Il faut activer la fonction si elle n'est pas active.", c: "Renommer une variable (ex. nombres → valeurs dans sumArray), puis Tab sur la suggestion suivante", d: "Notez combien de suggestions suivent votre modification et si elles sont correctes.", a: "Des occurrences proposées au renommage, acceptées une à une." },
+      { m: 5, t: "Chat inline dans le terminal", p: "Dans le terminal, Ctrl+I aide à écrire une commande. Une commande se relit toujours avant exécution.", c: "Ctrl+I dans le terminal : « commande pour lister récursivement les fichiers .js »", d: "Relisez la commande. L'exécutez seulement si vous comprenez chaque partie.", a: "Commande comprise et exécutée, ou refusée avec justification." },
+
+      // ---------- MODULE 6 : Tests, documentation, refactoring, bugs (42 à 49) ----------
+      { m: 6, t: "Lancer et lire la suite de tests", p: "Les tests sont le filet de sécurité de toutes les modifications faites par Copilot.", c: "Terminal dans code/ : npm test", d: "Gardez une trace du résultat avant toute modification.", a: "État initial noté : 8 pass, 2 fail." },
+      { m: 6, t: "Analyser un échec avec le chat", p: "Coller le message d'erreur dans le chat donne le contexte le plus utile à Copilot.", c: "Copier le message du test isValidTitle, puis : « explique cet échec, sans corriger »", d: "Identifiez la valeur attendue et la valeur reçue.", a: "L'explication cite la valeur attendue et la valeur reçue." },
+      { m: 6, t: "Corriger countDone avec /fix", p: "Un bug d'indice (boucle qui commence à 1) est classique. Le test sert de preuve.", c: "Sélectionner countDone puis /fix", d: "Appliquez la correction puis relancez npm test.", a: "Le test countDone passe." },
+      { m: 6, t: "Corriger isValidTitle avec un prompt précis", p: "Un prompt précis (règle, exemple, fichier) donne une correction plus fiable qu'un « corrige ça ».", c: "« #file:js/utils.js corrige isValidTitle : un titre composé uniquement d'espaces doit être refusé »", d: "Relancez npm test puis lisez la correction.", a: "Tous les tests passent." },
+      { m: 6, t: "Ajouter des cas limites", p: "Les cas limites (vide, très long, espaces) révèlent les erreurs cachées.", c: "« ajoute dans tests/utils.test.js des tests pour un titre de 101 caractères et pour une valeur non textuelle »", d: "Lancez npm test. Si un test échoue, décidez qui a tort : le test ou le code.", a: "Nouveaux tests exécutés, décision justifiée." },
+      { m: 6, t: "Refactoriser sans changer le comportement", p: "Refactoriser = améliorer la forme sans changer le résultat. Les tests prouvent qu'on n'a rien cassé.", c: "« #file:js/app.js refactorise sans changer le comportement : noms plus clairs, fonctions plus courtes »", d: "Relancez npm test et ouvrez l'application pour vérifier ajout, filtre et suppression.", a: "Tests verts, application identique à l'usage." },
+      { m: 6, t: "Documenter le projet en mode Edit", p: "Le mode Edit modifie un fichier à partir d'une demande. Idéal pour un texte de documentation.", c: "Mode Edit, #file:README.md : « rédige la section Installation et Lancer les tests »", d: "Relisez les commandes proposées et vérifiez-les dans le terminal.", a: "Une section Installation exacte, commandes vérifiées." },
+      { m: 6, t: "Relire toutes les modifications", p: "Une modification Copilot se relit comme une modification humaine. Ne jamais garder ce qu'on ne comprend pas.", c: "Vue diff de VS Code sur chaque fichier modifié", d: "Pour chaque fichier, expliquez en une phrase ce qui a changé.", a: "Une phrase par fichier modifié." },
+
+      // ---------- MODULE 7 : Modes Ask, Edit, Agent (50 à 55) ----------
+      { m: 7, t: "Mode Ask : répondre sans toucher aux fichiers", p: "Ask sert à comprendre, pas à modifier. C'est le mode le plus sûr pour apprendre.", c: "Mode Ask : « Quelle est la différence entre let et const dans app.js ? »", d: "Vérifiez qu'aucun fichier n'a été modifié.", a: "Réponse et aucun fichier modifié." },
+      { m: 7, t: "Mode Edit sur plusieurs fichiers", p: "Edit modifie plusieurs fichiers à partir d'une même demande. Il faut relire chaque fichier.", c: "Mode Edit : « ajoute un bouton Tout cocher dans index.html et app.js »", d: "Relisez les deux fichiers. Testez le bouton dans l'application.", a: "Les deux fichiers sont modifiés et le bouton fonctionne." },
+      { m: 7, t: "Mode Agent : tâche plus large", p: "Agent décide seul des fichiers à lire et des commandes à lancer. Plus puissant, donc plus à surveiller.", c: "Mode Agent : « ajoute un filtre par mot-clé dans l'interface, avec test »", d: "Observez les étapes de l'agent : fichiers lus, modifiés, commandes lancées. Notez-les.", a: "Liste des étapes visible et modifications proposées." },
+      { m: 7, t: "Valider ou annuler les actions de l'agent", p: "Garder seulement ce qui est utile est la règle. L'agent n'a pas toujours raison.", c: "Boutons Keep / Undo sur chaque modification", d: "Gardez une partie des modifications, annulez le reste et notez pourquoi.", a: "Le projet reflète votre décision." },
+      { m: 7, t: "Autorisation des commandes en mode Agent", p: "Une commande peut modifier le système. L'autorisation manuelle protège contre les erreurs.", c: "Agent : « lance npm test et corrige ce qui échoue »", d: "Refusez une commande une fois, puis acceptez-la. Notez la différence de déroulement.", a: "Vous comprenez quand une commande est demandée." },
+      { m: 7, t: "Choisir le bon mode", p: "Le bon mode évite de modifier le code quand il ne faut pas, et de perdre du temps quand il faut agir.", c: "Notes", d: "Tableau de 3 lignes (Ask, Edit, Agent) : usage, risque, exemple tiré de la formation.", a: "Tableau complet dans vos notes." },
+
+      // ---------- MODULE 8 : Instructions personnalisées (56 à 62) ----------
+      { m: 8, t: "Créer les instructions globales du dépôt", p: "Les instructions évitent de répéter les mêmes règles dans chaque prompt. Elles s'appliquent à tout le projet.", c: "Créer code/.github/copilot-instructions.md avec : « Répondre en français. Utiliser const et let, jamais var. Commenter en français. »", d: "Ajoutez au moins 4 règles propres à ce projet.", a: "Fichier créé avec ses règles." },
+      { m: 8, t: "Tester les instructions globales", p: "Une règle non testée n'est pas une règle. Il faut vérifier que Copilot la respecte.", c: "Mode Ask : « ajoute une fonction qui compte les tâches à faire »", d: "Vérifiez chaque règle dans le code généré.", a: "Le code respecte les règles (langue, const/let, commentaires)." },
+      { m: 8, t: "Créer des instructions par type de fichier", p: "applyTo cible un type de fichier : une règle JavaScript ne doit pas polluer le HTML.", c: "Créer code/.github/instructions/javascript.instructions.md avec applyTo: \"**/*.js\"", d: "Ajoutez une règle : « les callbacks utilisent les fonctions fléchées ».", a: "Fichier avec frontmatter applyTo correct." },
+      { m: 8, t: "Instructions pour HTML", p: "Chaque langage a ses bonnes pratiques. Une règle ciblée est plus efficace qu'une règle générale.", c: "Créer code/.github/instructions/html.instructions.md avec applyTo: \"**/*.html\" : « toujours mettre l'attribut lang et des alt sur les images »", d: "Demandez une modification de index.html et vérifiez la règle.", a: "La règle HTML est appliquée seulement aux fichiers .html." },
+      { m: 8, t: "Créer AGENTS.md", p: "AGENTS.md donne des consignes aux agents, lisibles par plusieurs outils. C'est un fichier commun.", c: "Créer code/AGENTS.md : rôle du projet, commandes (npm test), conventions", d: "Relancez une demande en mode Agent et vérifiez qu'il utilise les commandes indiquées.", a: "L'agent lance npm test comme indiqué dans AGENTS.md." },
+      { m: 8, t: "Vérifier quelles instructions sont prises en compte", p: "Plusieurs fichiers peuvent coexister. Il faut savoir lesquels sont réellement lus.", c: "Chat : « quelles instructions de projet tiens-tu en compte pour ce fichier ? »", d: "Comparez la réponse avec les fichiers créés.", a: "Liste cohérente avec les fichiers existants." },
+      { m: 8, t: "Régler les emplacements d'instructions", p: "Les paramètres définissent où Copilot cherche les fichiers d'instructions. Ils changent selon la version.", c: "Ctrl+, → chercher « instructions » dans les paramètres Copilot", d: "Notez le paramètre utilisé pour les fichiers d'instructions et sa valeur par défaut.", a: "Paramètre identifié et noté." },
+
+      // ---------- MODULE 9 : Prompt files (63 à 68) ----------
+      { m: 9, t: "Créer un prompt réutilisable", p: "Un prompt file enregistre une demande fréquente. Toute l'équipe peut l'appeler avec la même commande.", c: "Créer code/.github/prompts/revue-js.prompt.md avec description, mode: ask et le texte de la revue", d: "Le texte demande une revue : bugs, lisibilité, risques, par ordre de gravité.", a: "Fichier créé avec une description." },
+      { m: 9, t: "Appeler un prompt sur une sélection", p: "Un prompt peut utiliser la sélection ou le fichier courant. Cela évite de retaper la consigne.", c: "Sélectionner une fonction puis taper /revue-js dans le chat", d: "Comparez la revue à celle obtenue avec une question libre.", a: "La revue porte sur la sélection." },
+      { m: 9, t: "Prompt en mode Agent avec outils", p: "Un prompt peut fixer le mode et les outils. Cela rend son comportement prévisible.", c: "Créer code/.github/prompts/genere-tests.prompt.md avec mode: agent et les outils de lecture et d'édition", d: "Appelez-le sur utils.js et vérifiez qu'il écrit dans tests/.", a: "Tests ajoutés dans le bon dossier." },
+      { m: 9, t: "Prompt de documentation", p: "Les prompts sont l'outil idéal pour une tâche répétitive comme la documentation.", c: "Créer code/.github/prompts/doc-fonction.prompt.md : « documente la fonction sélectionnée en JSDoc »", d: "Utilisez-le sur deux fonctions de utils.js.", a: "Deux blocs JSDoc ajoutés." },
+      { m: 9, t: "Partager les prompts avec l'équipe", p: "Un fichier versionné est partagé par Git. C'est le principe d'un outil d'équipe.", c: "git add code/.github/prompts && git commit -m \"Ajout des prompts\"", d: "Vérifiez que les fichiers sont suivis par Git.", a: "Les prompts apparaissent dans git log." },
+      { m: 9, t: "Choisir entre prompt, instructions et skill", p: "Trois outils voisins. Une bonne règle : instructions = règles permanentes, prompt = tâche ponctuelle.", c: "Notes", d: "Tableau de 3 lignes : quand utiliser, exemple dans ce projet, risque d'un mauvais choix.", a: "Tableau complet." },
+
+      // ---------- MODULE 10 : Agents personnalisés (69 à 75) ----------
+      { m: 10, t: "Créer un agent relecteur en lecture seule", p: "Un agent personnalisé fixe un rôle, des outils et des consignes. Un relecteur qui ne peut pas modifier évite les accidents.", c: "Créer code/.github/agents/relecteur.agent.md : description, outils de lecture et de recherche uniquement, consigne de relecture", d: "Rédigez la consigne : rôle, format de réponse, interdiction de modifier les fichiers.", a: "Fichier créé avec frontmatter et consigne." },
+      { m: 10, t: "Sélectionner l'agent dans le chat", p: "Un agent n'est utile que s'il est choisi au bon moment.", c: "Sélecteur de mode/agent du chat → relecteur", d: "Notez comment le chat change de comportement.", a: "Le relecteur est sélectionné et visible." },
+      { m: 10, t: "Tester la lecture seule", p: "Un test de sécurité : l'agent doit refuser de modifier les fichiers.", c: "Relecteur : « relis js/app.js et propose des améliorations »", d: "Vérifiez qu'aucun fichier n'a été modifié (Source Control).", a: "Des suggestions en texte, aucune modification." },
+      { m: 10, t: "Créer un agent testeur avec outils d'édition", p: "Chaque agent a un rôle. Le testeur peut écrire des tests et lancer npm test.", c: "Créer code/.github/agents/testeur.agent.md : écrit des tests dans tests/ et lance npm test", d: "Limitez les outils à ce qui est nécessaire. Justifiez dans la consigne.", a: "Agent créé avec outils limités." },
+      { m: 10, t: "Utiliser l'agent testeur", p: "Un agent spécialisé donne des résultats plus cohérents qu'un agent généraliste.", c: "Testeur : « ajoute des tests pour tachesFiltrees() »", d: "Lancez npm test et vérifiez les tests ajoutés.", a: "Tests ajoutés et exécutés." },
+      { m: 10, t: "Agent et handoff (si disponible)", p: "Certains agents peuvent passer la main à un autre agent. C'est la base des flux à plusieurs rôles.", c: "Ajouter dans le frontmatter un handoff du relecteur vers le testeur (selon version)", d: "Testez le passage d'un agent à l'autre. Si votre version ne le supporte pas, notez-le.", a: "Passage effectif ou limite notée." },
+      { m: 10, t: "Comparer agent personnalisé et Agent par défaut", p: "Le rôle personnalisé change la qualité et la sécurité. Il faut le mesurer.", c: "Même demande avec l'agent par défaut puis avec le testeur", d: "Tableau : précision, respect des règles, modifications faites, temps.", a: "Tableau comparatif dans les notes." },
+
+      // ---------- MODULE 11 : Agent skills (76 à 80) ----------
+      { m: 11, t: "Créer une skill de français", p: "Une skill est une compétence réutilisable, décrite dans un dossier. Elle est chargée quand la tâche le demande.", c: "Créer code/.github/skills/francais/SKILL.md avec frontmatter name et description, puis les règles de rédaction", d: "Décrivez précisément quand la skill doit s'appliquer.", a: "SKILL.md créé avec name et description." },
+      { m: 11, t: "Activer les skills", p: "Selon la version, les skills doivent être activées. Une skill non active n'est jamais utilisée.", c: "Ctrl+, → chercher « skills » ou « agent skills » (ou palette : Chat: Configure Skills)", d: "Vérifiez que la skill apparaît dans la liste.", a: "La skill francais est listée et active." },
+      { m: 11, t: "Tester la skill", p: "Une skill se mesure à son effet : la réponse doit suivre ses règles.", c: "Chat : « rédige le commentaire d'introduction de app.js »", d: "Vérifiez que la rédaction suit les règles de la skill.", a: "Rédaction conforme." },
+      { m: 11, t: "Ajouter une ressource à la skill", p: "Une skill peut contenir des fichiers de référence. Cela évite de tout écrire dans SKILL.md.", c: "Créer code/.github/skills/francais/glossaire.md et le citer dans SKILL.md", d: "Ajoutez 5 termes du projet avec leur traduction.", a: "Le glossaire est utilisé dans une réponse." },
+      { m: 11, t: "Choisir entre skill, instructions et prompt", p: "Le bon outil dépend de la nature de la règle : permanente, ponctuelle ou spécialisée.", c: "Notes", d: "Une règle pour chaque outil, avec le raisonnement.", a: "Trois règles justifiées dans les notes." },
+
+      // ---------- MODULE 12 : MCP (81 à 86) ----------
+      { m: 12, t: "Configurer un serveur MCP", p: "MCP connecte Copilot à des outils externes (documentation, base de données, API). Il étend ce que l'agent peut faire.", c: "Créer code/.vscode/mcp.json avec un serveur (ou palette : MCP: Add Server)", d: "Choisissez un serveur de documentation ou de fichiers. Notez pourquoi.", a: "Fichier mcp.json avec un serveur déclaré." },
+      { m: 12, t: "Démarrer le serveur et lister ses outils", p: "Un serveur n'est utile que s'il est démarré et que ses outils sont visibles.", c: "Palette : MCP: List Servers, puis Configure Tools", d: "Notez les outils proposés et leur rôle.", a: "Liste des outils du serveur notée." },
+      { m: 12, t: "Utiliser un outil MCP en mode Agent", p: "L'agent appelle les outils MCP pour répondre. C'est là que MCP prend tout son intérêt.", c: "Mode Agent : « utilise l'outil du serveur pour résumer la documentation de Array.filter »", d: "Observez l'appel d'outil dans la réponse.", a: "L'outil MCP est appelé et sa réponse utilisée." },
+      { m: 12, t: "Vérifier la confiance accordée au serveur", p: "Un serveur MCP exécute du code. Il faut accepter seulement ceux qu'on connaît.", c: "Boîte de dialogue de confiance au démarrage du serveur", d: "Lisez ce qui est demandé. Refusez une fois, puis acceptez, et notez le comportement.", a: "Vous comprenez la différence entre accepter et refuser." },
+      { m: 12, t: "Désactiver un outil MCP", p: "Limiter les outils disponibles réduit les risques et le bruit.", c: "Configure Tools → décocher un outil", d: "Vérifiez qu'il n'est plus proposé à l'agent.", a: "L'outil n'apparaît plus dans les appels." },
+      { m: 12, t: "Documenter le serveur MCP", p: "Un serveur non documenté est difficile à reprendre pour un collègue.", c: "Ajouter une section MCP dans code/README.md", d: "Indiquez le nom du serveur, son rôle et comment le démarrer.", a: "Section MCP présente dans le README." },
+
+      // ---------- MODULE 13 : Paramètres et gouvernance (87 à 90) ----------
+      { m: 13, t: "Filtrer les suggestions publiques", p: "Certaines suggestions peuvent reprendre du code public. Le paramètre de filtrage contrôle ce risque.", c: "Ctrl+, → chercher « public code » ou « suggestions matching »", d: "Notez la valeur actuelle et ce qu'elle implique pour une entreprise.", a: "Paramètre identifié, impact expliqué." },
+      { m: 13, t: "Choisir le modèle par défaut du chat", p: "Le modèle par défaut conditionne les réponses de toute l'équipe si le paramètre est partagé.", c: "Ctrl+, → chercher « model » dans les paramètres Copilot", d: "Notez où se règle le modèle et si l'équipe peut le forcer.", a: "Réglage identifié." },
+      { m: 13, t: "Exclure des fichiers sensibles", p: "Un fichier de secrets ne doit jamais être envoyé comme contexte. Les exclusions protègent ce cas.", c: "Paramètres d'exclusion Copilot (ou .copilotignore selon version)", d: "Créer un fichier secrets.env factice et vérifier qu'il est exclu.", a: "Fichier exclu du contexte." },
+      { m: 13, t: "Confirmation des outils et actions", p: "Les confirmations évitent les actions automatiques non voulues. Savoir où les régler est essentiel.", c: "Paramètres : chercher « confirm » ou « auto approve » dans les paramètres chat", d: "Réglez le niveau le plus prudent et expliquez votre choix.", a: "Réglage prudent appliqué et justifié." },
+
+      // ---------- MODULE 14 : Git et GitHub (91 à 96) ----------
+      { m: 14, t: "Initialiser Git et premier commit", p: "Copilot travaille mieux avec un historique : on compare, on relit, on revient en arrière.", c: "Terminal dans code/ : git init · git add . · git commit -m \"Initial\"", d: "Si Git demande votre identité, configurez-la avec git config.", a: "git log affiche le commit Initial." },
+      { m: 14, t: "Générer un message de commit", p: "Un bon message décrit le pourquoi. Copilot propose un premier jet à corriger.", c: "Source Control → icône ✨ Generate Commit Message", d: "Modifiez un fichier, générez le message, puis corrigez-le.", a: "Message généré et amélioré." },
+      { m: 14, t: "Créer une branche de travail", p: "Une branche isole les modifications d'agents. Si le résultat ne convient pas, on jette la branche.", c: "git checkout -b feature/copilot", d: "Faites vos modifications des étapes suivantes sur cette branche.", a: "La branche feature/copilot est active." },
+      { m: 14, t: "Décrire une Pull Request", p: "Une PR bien décrite est relue plus vite. Copilot peut rédiger la structure.", c: "Chat : « rédige une description de PR en Markdown : contexte, changements, tests »", d: "Relisez, corrigez et gardez-la pour la PR.", a: "Description Markdown utilisable." },
+      { m: 14, t: "Demander une revue de code à Copilot", p: "Copilot peut relire une PR sur GitHub. Cela complète la relecture humaine, sans la remplacer.", c: "Pousser la branche, ouvrir une PR, puis Reviewers → Copilot", d: "Si votre compte et dépôt le permettent, lancez la revue. Sinon, notez la limite.", a: "Commentaires de Copilot sur la PR, ou limite notée." },
+      { m: 14, t: "Confier une issue à Copilot (coding agent)", p: "Le coding agent travaille sur une issue et ouvre une PR. Il faut décrire la tâche précisément.", c: "Créer une issue sur GitHub, puis Assignees → Copilot", d: "Décrivez une petite tâche (ex. bouton de réinitialisation du filtre). Optionnel selon votre formule.", a: "Une PR créée par Copilot, ou disponibilité notée." },
+
+      // ---------- MODULE 15 : CLI et bilan (97 à 100) ----------
+      { m: 15, t: "Installer et connecter la CLI Copilot", p: "La CLI donne accès à Copilot hors de l'éditeur : utile pour scripts et serveurs sans interface.", c: "npm install -g @github/copilot (vérifier la documentation à jour) puis copilot et /login", d: "Connectez-vous et vérifiez que la CLI répond.", a: "CLI installée et connectée." },
+      { m: 15, t: "Utiliser les instructions du projet dans la CLI", p: "Les consignes du projet doivent être les mêmes partout : éditeur, agents, CLI.", c: "Dans code/, lancer copilot et demander : « quelles règles du projet appliques-tu ? »", d: "Comparez avec copilot-instructions.md et AGENTS.md.", a: "Les règles du projet sont reprises." },
+      { m: 15, t: "Demander une commande shell à la CLI", p: "La CLI peut proposer une commande. L'exécution reste sous votre contrôle.", c: "« Trouve tous les fichiers .js du projet »", d: "Relisez la commande, puis acceptez ou refusez son exécution.", a: "Décision prise et justifiée." },
+      { m: 15, t: "Bilan : une fonctionnalité de bout en bout", p: "Le bilan combine tout : codebase, chat, agent, instructions, prompt, skill, tests, Git.", c: "Mini-projet : « Filtrer par mot-clé » dans l'application, avec tests, en utilisant au moins 5 outils de la formation", d: "Documentez dans vos notes : outils utilisés, décisions prises, ce que Copilot a fait de bien et de mal.", a: "Fonctionnalité qui marche, tests verts, notes exportées (.txt)." }
+    ];
+
+    // ---------- Rendu ----------
+    const STOCKAGE = "formation-copilot-v2";
+    const contenu = document.getElementById("contenu");
+    let donnees = { fait: {}, notes: {} };
+
+    try {
+      donnees = JSON.parse(localStorage.getItem(STOCKAGE)) || donnees;
+    } catch (e) {
+      // Pas de stockage disponible : on continue sans sauvegarde.
+    }
+
+    function sauvegarder() {
+      try {
+        localStorage.setItem(STOCKAGE, JSON.stringify(donnees));
+      } catch (e) {
+        // Ignoré : la page reste utilisable.
+      }
+    }
+
+    function echapper(texte) {
+      return texte.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function rendre() {
+      let html = "";
+      let moduleCourant = -1;
+
+      ETAPES.forEach((etape, index) => {
+        const numero = index + 1;
+        if (etape.m !== moduleCourant) {
+          moduleCourant = etape.m;
+          const mod = MODULES.find((x) => x.id === etape.m);
+          html += `<h2 class="module">Module ${mod.id} : ${echapper(mod.titre)} <small>(${mod.duree})</small></h2>`;
+        }
+        const faite = !!donnees.fait[numero];
+        html += `
+          <article class="etape ${faite ? "fait" : ""}" data-numero="${numero}">
+            <div class="entete">
+              <div class="numero">${numero}</div>
+              <h3 class="titre">${echapper(etape.t)}</h3>
+              <label class="check"><input type="checkbox" class="coche" ${faite ? "checked" : ""}> Fait</label>
+            </div>
+            <div class="champ pourquoi"><strong>Pourquoi</strong><br>${echapper(etape.p)}</div>
+            <div class="champ"><strong>Commande ou raccourci</strong><br><code class="commande">${echapper(etape.c)}</code></div>
+            <div class="champ travail"><strong>Travail à faire</strong><br>${echapper(etape.d)}</div>
+            <div class="champ"><strong>Résultat attendu</strong><br>${echapper(etape.a)}</div>
+            <div class="champ"><strong>Mes observations</strong>
+              <textarea class="notes" placeholder="Notez ici ce que vous avez obtenu, vos questions, les écarts observés...">${echapper(donnees.notes[numero] || "")}</textarea>
+            </div>
+          </article>`;
+      });
+
+      contenu.innerHTML = html;
+      mettreAJourProgression();
+    }
+
+    function mettreAJourProgression() {
+      const total = ETAPES.length;
+      const nb = Object.values(donnees.fait).filter(Boolean).length;
+      document.getElementById("compte").textContent = nb;
+      document.getElementById("barre-progression").style.width = `${(nb / total) * 100}%`;
+    }
+
+    contenu.addEventListener("change", (evenement) => {
+      if (!evenement.target.classList.contains("coche")) return;
+      const article = evenement.target.closest(".etape");
+      const numero = Number(article.dataset.numero);
+      donnees.fait[numero] = evenement.target.checked;
+      article.classList.toggle("fait", evenement.target.checked);
+      sauvegarder();
+      mettreAJourProgression();
+    });
+
+    contenu.addEventListener("input", (evenement) => {
+      if (!evenement.target.classList.contains("notes")) return;
+      const numero = Number(evenement.target.closest(".etape").dataset.numero);
+      donnees.notes[numero] = evenement.target.value;
+      sauvegarder();
+    });
+
+    document.getElementById("btn-export").addEventListener("click", () => {
+      let texte = "FORMATION GITHUB COPILOT : MES NOTES\n\n";
+      let moduleCourant = -1;
+      ETAPES.forEach((etape, index) => {
+        const numero = index + 1;
+        if (etape.m !== moduleCourant) {
+          moduleCourant = etape.m;
+          const mod = MODULES.find((x) => x.id === etape.m);
+          texte += `\n=== Module ${mod.id} : ${mod.titre} ===\n\n`;
+        }
+        const etat = donnees.fait[numero] ? "[X]" : "[ ]";
+        texte += `${etat} Étape ${numero} : ${etape.t}\n`;
+        texte += `    Commande : ${etape.c}\n`;
+        texte += `    Notes : ${(donnees.notes[numero] || "(aucune)").replace(/\n/g, "\n            ")}\n\n`;
+      });
+      const blob = new Blob([texte], { type: "text/plain;charset=utf-8" });
+      const lien = document.createElement("a");
+      lien.href = URL.createObjectURL(blob);
+      lien.download = "mes-notes-copilot.txt";
+      lien.click();
+      URL.revokeObjectURL(lien.href);
+    });
+
+    document.getElementById("btn-replier").addEventListener("click", () => {
+      document.querySelectorAll(".notes").forEach((zone) => {
+        zone.style.display = zone.style.display === "none" ? "" : "none";
+      });
+    });
+
+    document.getElementById("btn-reset").addEventListener("click", () => {
+      if (!confirm("Effacer toute votre progression et vos notes ?")) return;
+      donnees = { fait: {}, notes: {} };
+      sauvegarder();
+      rendre();
+    });
+
+    rendre();
+  </script>
+</body>
+</html>

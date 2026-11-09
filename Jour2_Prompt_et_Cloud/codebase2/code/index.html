@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ma Liste de Tâches</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="conteneur">
+    <h1>Ma Liste de Tâches</h1>
+
+    <form id="formulaire" class="ajout">
+      <input id="champ-titre" type="text" placeholder="Nouvelle tâche..." autocomplete="off">
+      <button type="submit">Ajouter</button>
+    </form>
+    <p id="message" class="message" role="alert"></p>
+
+    <div class="filtres">
+      <button data-filtre="toutes" class="actif">Toutes</button>
+      <button data-filtre="a-faire">À faire</button>
+      <button data-filtre="terminees">Terminées</button>
+    </div>
+
+    <ul id="liste" class="liste"></ul>
+
+    <footer class="pied">
+      <span id="compteur">0 tâche restante</span>
+      <button id="bouton-vider">Supprimer les terminées</button>
+    </footer>
+  </main>
+
+  <script src="js/utils.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

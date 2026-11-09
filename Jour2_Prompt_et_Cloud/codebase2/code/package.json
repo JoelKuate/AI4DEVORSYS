@@ -1,0 +1,9 @@
+{
+  "name": "ma-liste-de-taches",
+  "version": "1.0.0",
+  "description": "Projet débutant pour la formation GitHub Copilot",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/utils.test.js"
+  }
+}
