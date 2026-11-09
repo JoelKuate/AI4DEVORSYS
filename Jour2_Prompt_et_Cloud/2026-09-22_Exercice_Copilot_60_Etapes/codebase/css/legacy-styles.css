@@ -1,0 +1,39 @@
+/* Ancien fichier de styles (fictif, usage formation).
+
+   NOTE PEDAGOGIQUE : ce fichier est volontairement mal ecrit (valeurs
+   magiques repetees, usage de !important, selecteurs trop specifiques,
+   duplication) pour servir de cible a l'etape "Ameliorer un code
+   existant" de l'exercice. Il stylise d'anciens badges de priorite,
+   remplaces depuis par le systeme .badge de components.css, mais
+   encore references par erreur a certains endroits du projet. */
+
+.old-badge-low,
+.old-badge-medium,
+.old-badge-high,
+.old-badge-critical {
+  color: var(--color-text-inverse);
+  padding: var(--badge-padding-y) var(--space-sm);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+}
+
+.old-badge-low {
+  background-color: var(--priority-low);
+}
+
+.old-badge-medium {
+  background-color: var(--priority-medium);
+}
+
+.old-badge-high {
+  background-color: var(--priority-high);
+}
+
+.old-badge-critical {
+  background-color: var(--priority-critical);
+}
+
+.card-title.old {
+  font-size: var(--font-size-card-title);
+  color: var(--color-text);
+}

@@ -1,0 +1,106 @@
+/* Composants réutilisables — TaskBoard (fictif, usage formation) */
+
+.count {
+  background: var(--color-border);
+  color: var(--color-text-dim);
+  border-radius: var(--radius-pill);
+  padding: 1px 9px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.card-title {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.card-description {
+  font-size: 0.82rem;
+  color: var(--color-text-dim);
+  margin: 6px 0;
+}
+
+.card-due {
+  font-size: 0.74rem;
+  color: var(--color-text-mute);
+  margin: 0;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  color: #fff;
+  white-space: nowrap;
+}
+
+.badge[data-priority="low"] { background: var(--priority-low); }
+.badge[data-priority="medium"] { background: var(--priority-medium); }
+.badge[data-priority="high"] { background: var(--priority-high); }
+.badge[data-priority="critical"] { background: var(--priority-critical); }
+
+.btn {
+  display: inline-block;
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: var(--color-accent-2);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-accent);
+  border: 1px solid var(--color-border);
+}
+
+.form-panel {
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  max-width: 640px;
+}
+
+.form-panel label {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--color-text-dim);
+  margin-top: var(--space-sm);
+}
+
+.form-panel input,
+.form-panel select,
+.form-panel textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.92rem;
+  margin-top: 4px;
+}
+
+.form-panel button {
+  margin-top: var(--space-md);
+}
+
+/* TODO (exercice, Étape 4) : ajouter une classe .badge--outline (variante à bordure,
+   sans fond coloré) en respectant le même système de variables que ci-dessus. */

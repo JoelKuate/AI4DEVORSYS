@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskBoard — À propos</title>
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+<header class="app-header">
+  <h1>TaskBoard</h1>
+  <p class="tagline">Codebase d'exercice — formation GitHub Copilot Transactis (aucune donnée réelle)</p>
+  <nav class="app-nav" aria-label="Navigation principale">
+    <a href="index.html">Tableau</a>
+    <a href="task-detail.html">Détail d'une tâche</a>
+    <a href="about.html" aria-current="page">À propos</a>
+  </nav>
+</header>
+
+<main>
+  <section class="form-panel">
+    <h2>À propos de TaskBoard</h2>
+    <p>
+      TaskBoard est un petit projet fictif de tableau de tâches, en
+      <strong>HTML</strong>, <strong>CSS</strong> et <strong>JavaScript</strong>,
+      construit pour l'exercice pratique « 60 étapes GitHub Copilot ».
+    </p>
+    <p>
+      Le projet est volontairement incomplet : les cartes de tâches
+      existantes sont écrites directement dans le HTML, mais le
+      formulaire de la page d'accueil n'est pas encore relié au script
+      <code>js/app.js</code>, qui contient aussi un bug volontaire et
+      plusieurs <code>TODO</code>. L'objectif est de pratiquer GitHub
+      Copilot sur un vrai petit projet multi-fichiers (plusieurs pages,
+      plusieurs feuilles de styles, un script) pour aller du prompt le
+      plus simple jusqu'à l'orchestration d'agents.
+    </p>
+    <p>
+      Consultez <a href="docs/architecture.md">docs/architecture.md</a>
+      pour le détail de l'organisation des fichiers.
+    </p>
+  </section>
+</main>
+
+<footer class="app-footer">
+  <p>TaskBoard — projet fictif construit pour la formation GitHub Copilot Transactis. Digital House Company.</p>
+</footer>
+</body>
+</html>

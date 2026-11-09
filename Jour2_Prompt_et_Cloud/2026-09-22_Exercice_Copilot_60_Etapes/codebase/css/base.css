@@ -1,0 +1,37 @@
+/* Reset et styles de base — TaskBoard (fictif, usage formation) */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+h1, h2, h3 {
+  color: var(--color-accent);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+a {
+  color: var(--color-accent-2);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+img {
+  max-width: 100%;
+}
