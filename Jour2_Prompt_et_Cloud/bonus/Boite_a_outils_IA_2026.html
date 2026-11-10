@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boîte à outils IA — harnais, skills, moteurs d'inférence, GGUF, dépôts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFFFF;
+  --bg2:#F2F7F7;
+  --accent:#0E8C86;
+  --accent2:#0B6E68;
+  --navy:#0B2D48;
+  --navy2:#08202F;
+  --text:#16212B;
+  --text2:#4B5C63;
+  --card:#EAF4F3;
+  --border:#D7E6E4;
+  --good:#1F9D67;
+  --warn:#B9740A;
+  --bad:#C1443B;
+  --code:#0F2733;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;}
+.deck{position:relative;width:100vw;height:100vh;}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;padding:5.5vh 8vw;opacity:0;transition:opacity .25s ease;overflow-y:auto;}
+.slide.active{display:flex;opacity:1;}
+.slide-tag{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent2);font-weight:700;margin-bottom:1rem;}
+.slide-title{font-size:2.1rem;font-weight:800;margin-bottom:1.2rem;line-height:1.22;max-width:94%;color:var(--navy);}
+.slide h3.subtitle{font-size:1.15rem;font-weight:400;color:var(--text2);margin-bottom:1rem;}
+ul.points{list-style:none;max-width:88%;}
+ul.points li{font-size:1.1rem;line-height:1.5;margin-bottom:.7rem;padding-left:1.7rem;position:relative;color:var(--text2);}
+ul.points li::before{content:"\203A";position:absolute;left:0;color:var(--accent2);font-weight:700;font-size:1.3rem;}
+ul.points li b, ul.points li strong{color:var(--text);font-weight:700;}
+ul.points ul{list-style:none;margin-top:.4rem;}
+ul.points ul li{font-size:.98rem;margin-bottom:.3rem;}
+ul.points ul li::before{content:"\2013";font-size:1rem;}
+.note{margin-top:1.2rem;padding:.85rem 1.2rem;background:var(--card);border-left:4px solid var(--accent);border-radius:6px;font-size:.98rem;color:var(--text2);max-width:88%;}
+.note b{color:var(--accent2);}
+.warn{margin-top:1.2rem;padding:.85rem 1.2rem;background:#FFF6E8;border-left:4px solid var(--warn);border-radius:6px;font-size:.98rem;color:var(--text2);max-width:88%;}
+.warn b{color:var(--warn);}
+.src{margin-top:.9rem;font-size:.85rem;color:var(--text2);max-width:88%;}
+.src a{color:var(--accent2);text-decoration:none;border-bottom:1px dotted var(--accent2);}
+.src a:hover{color:var(--navy);}
+.slide-cover{align-items:flex-start;background:radial-gradient(circle at 80% 20%, #E3F2F1 0%, var(--bg) 60%);}
+.cover-org{font-size:.92rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent2);margin-bottom:1.6rem;}
+.cover-title{font-size:3rem;font-weight:800;max-width:88%;line-height:1.16;margin-bottom:1rem;color:var(--navy);}
+.cover-sub{font-size:1.25rem;color:var(--text2);max-width:78%;margin-bottom:2rem;}
+.cover-meta{display:flex;gap:2.2rem;flex-wrap:wrap;font-size:.95rem;color:var(--text2);}
+.cover-meta span b{color:var(--navy);display:block;font-size:1.05rem;}
+.cover-contact{position:absolute;bottom:6vh;left:8vw;font-size:.95rem;color:var(--accent2);}
+.slide-divider{align-items:center;text-align:center;background:linear-gradient(135deg, var(--bg) 0%, #E7F3F2 100%);}
+.section-tag{font-size:1rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent2);margin-bottom:1rem;}
+.section-title{font-size:2.7rem;font-weight:800;max-width:84%;line-height:1.2;margin-bottom:1rem;color:var(--navy);}
+.section-sub{font-size:1.1rem;color:var(--text2);max-width:70%;}
+.section-num{font-size:5.2rem;font-weight:800;color:var(--border);position:absolute;top:6vh;right:8vw;}
+.slide-question{background:linear-gradient(135deg,#FFF8ED 0%, var(--bg) 100%);border-top:6px solid var(--warn);}
+.q-tag{font-size:.85rem;letter-spacing:.15em;text-transform:uppercase;color:var(--warn);font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+.q-question{font-size:1.55rem;font-weight:700;margin-bottom:1.2rem;max-width:90%;color:var(--navy);line-height:1.35;}
+.q-hint{font-size:1.02rem;color:var(--text2);max-width:86%;line-height:1.5;}
+.q-footer{margin-top:1.2rem;font-size:.92rem;color:var(--text2);font-style:italic;}
+.slide-anecdote{background:linear-gradient(135deg,#F0F8F7 0%, var(--bg) 100%);border-top:6px solid var(--accent);}
+.an-tag{font-size:.85rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent2);font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+.an-title{font-size:1.6rem;font-weight:700;margin-bottom:.9rem;max-width:90%;color:var(--navy);}
+.an-body{font-size:1.05rem;color:var(--text2);max-width:88%;line-height:1.55;}
+.an-body b{color:var(--text);}
+.slide-quote{align-items:center;text-align:center;background:linear-gradient(135deg,var(--navy) 0%, var(--navy2) 100%);color:#fff;}
+.slide-quote .mini-relance{color:#B9D6D3;border-top-color:#2A4C63;}
+.q-mark{font-size:3.6rem;color:var(--accent);line-height:1;margin-bottom:.5rem;font-family:Georgia,serif;}
+.quote-text{font-size:1.8rem;font-weight:600;max-width:80%;line-height:1.4;margin-bottom:1.2rem;}
+.quote-author{font-size:1.05rem;color:#B9D6D3;}
+.quote-author b{color:#fff;}
+.slide-demo{background:linear-gradient(135deg,#EAF4FE 0%, var(--bg) 100%);border-top:6px solid #2E7DD1;}
+.demo-tag{font-size:.85rem;letter-spacing:.15em;text-transform:uppercase;color:#2E7DD1;font-weight:700;margin-bottom:1rem;}
+.demo-title{font-size:1.6rem;font-weight:700;margin-bottom:.7rem;color:var(--navy);}
+.demo-link{display:inline-block;margin-top:.5rem;background:#2E7DD1;color:#fff;padding:.55rem 1.1rem;border-radius:8px;text-decoration:none;font-weight:600;font-size:.98rem;}
+.slide-exercice{background:linear-gradient(135deg,#F0F8F7 0%, var(--bg) 100%);border-top:6px solid var(--accent);}
+.exo-tag{font-size:.85rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent2);font-weight:700;margin-bottom:1rem;}
+.exo-title{font-size:1.8rem;font-weight:700;margin-bottom:.5rem;color:var(--navy);}
+.exo-duree{font-size:.98rem;color:var(--text2);margin-bottom:1.1rem;}
+.exo-steps{max-width:88%;padding-left:1.3rem;}
+.exo-steps li{font-size:1.05rem;color:var(--text2);margin-bottom:.55rem;line-height:1.45;}
+.exo-livrable{margin-top:1.2rem;padding:.85rem 1.1rem;background:var(--card);border-radius:8px;font-size:1rem;border-left:4px solid var(--good);}
+.slide-cta{align-items:center;text-align:center;background:radial-gradient(circle at 50% 30%, #E3F2F1 0%, var(--bg) 70%);}
+.slide-cta h2{font-size:2.4rem;font-weight:800;margin-bottom:1rem;color:var(--navy);}
+.slide-cta p{font-size:1.2rem;color:var(--text2);margin-bottom:1.6rem;}
+.cta-links{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.2rem;}
+.cta-links a{color:var(--accent2);text-decoration:none;font-size:1.05rem;font-weight:600;border-bottom:2px solid var(--accent);padding-bottom:2px;}
+table.cmp{border-collapse:collapse;max-width:96%;margin-top:.9rem;}
+table.cmp th, table.cmp td{border:1px solid var(--border);padding:.55rem .85rem;font-size:.95rem;text-align:left;}
+table.cmp th{background:var(--card);color:var(--accent2);}
+table.cmp td{color:var(--text2);}
+table.cmp td b{color:var(--text);}
+.two-col{display:flex;gap:2.2rem;max-width:96%;}
+.two-col .col{flex:1;}
+.two-col h4{color:var(--accent2);font-size:1.02rem;margin-bottom:.5rem;}
+.three-col{display:flex;gap:1.6rem;max-width:96%;}
+.three-col .col{flex:1;background:var(--card);border-radius:8px;padding:1rem 1.1rem;}
+.three-col h4{color:var(--accent2);font-size:1rem;margin-bottom:.45rem;}
+.three-col p{font-size:.93rem;color:var(--text2);line-height:1.45;}
+.schema-box{margin-top:1.1rem;max-width:94%;}
+.schema-box svg{max-width:100%;height:auto;}
+.slide-code{background:linear-gradient(135deg,#F4F8F8 0%, var(--bg) 100%);border-top:6px solid var(--navy);}
+.code-tag{font-size:.85rem;letter-spacing:.15em;text-transform:uppercase;color:var(--navy);font-weight:700;margin-bottom:.8rem;}
+pre.code{background:var(--code);color:#E8F1F0;border-radius:10px;padding:1.1rem 1.3rem;font-family:'JetBrains Mono',Consolas,monospace;font-size:.86rem;line-height:1.55;overflow-x:auto;max-width:96%;white-space:pre;}
+pre.code .cm{color:#7FB3AE;}
+pre.code .kw{color:#7FC7FF;font-weight:600;}
+pre.code .st{color:#F2C57C;}
+pre.code .fn{color:#9FE3D0;}
+.file-path{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--accent2);margin-bottom:.5rem;}
+code.inline{font-family:'JetBrains Mono',monospace;background:var(--card);color:var(--accent2);padding:.1rem .35rem;border-radius:4px;font-size:.9em;}
+.progress-wrap{position:fixed;top:0;left:0;width:100%;height:4px;background:var(--border);z-index:50;}
+#progress{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--navy));transition:width .2s ease;}
+#counter{position:fixed;bottom:1.3vh;right:2vw;font-size:.78rem;color:var(--text2);z-index:50;letter-spacing:.05em;}
+.navbtn{position:fixed;top:50%;transform:translateY(-50%);z-index:50;background:var(--card);border:1px solid var(--border);color:var(--navy);width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1.15rem;display:flex;align-items:center;justify-content:center;opacity:.6;transition:opacity .2s;}
+.navbtn:hover{opacity:1;}
+#prevBtn{left:1.2vw;} #nextBtn{right:1.2vw;}
+.brand-mark{position:fixed;bottom:1.3vh;left:2vw;font-size:.7rem;color:#9FBDBA;letter-spacing:.1em;z-index:50;}
+.pdf-btn{position:fixed;top:1.3vh;right:2vw;z-index:60;background:var(--accent);color:#FFFFFF;border:none;border-radius:8px;padding:.5rem 1rem;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.4rem;box-shadow:0 2px 8px rgba(11,45,72,.25);transition:background .2s;}
+.pdf-btn:hover{background:var(--accent2);}
+.amorce{margin-top:1.1rem;padding-top:.7rem;border-top:1px dashed var(--border);font-size:.93rem;color:var(--accent2);font-style:italic;max-width:88%;}
+.mini-relance{margin-top:1.1rem;padding-top:.7rem;border-top:1px dashed var(--border);font-size:.9rem;color:var(--accent2);font-style:italic;max-width:88%;}
+@media print{
+  .navbtn,#counter,.progress-wrap,.brand-mark,.pdf-btn{display:none !important;}
+  body{overflow:visible;}
+  .slide{position:relative;display:flex !important;opacity:1 !important;page-break-after:always;height:100vh;}
+}
+@media (max-width:900px){
+  .slide{padding:4vh 5vw 12vh;justify-content:flex-start;}
+  .cover-title{font-size:2rem;}
+  .slide-title{font-size:1.45rem;}
+  .section-title{font-size:1.7rem;}
+  .section-num{font-size:3rem;top:3vh;right:5vw;}
+  .two-col,.three-col{flex-direction:column;gap:1rem;}
+  ul.points,.note,.warn,.src,.amorce,.mini-relance,.exo-steps{max-width:100%;}
+  ul.points li{font-size:1rem;}
+  .q-question{font-size:1.25rem;}
+  .quote-text{font-size:1.35rem;max-width:100%;}
+  pre.code{font-size:.68rem;padding:.8rem .9rem;}
+  table.cmp{display:block;overflow-x:auto;max-width:100%;}
+  .pdf-btn,.navbtn{display:none;}
+  .brand-mark{max-width:60%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+  .cover-contact{position:static;margin-top:1.5rem;}
+}
+
+table.cmp td.lk a{color:var(--accent2);text-decoration:none;border-bottom:1px dotted var(--accent2);font-family:'JetBrains Mono',monospace;font-size:.82rem;overflow-wrap:anywhere;}
+table.cmp td.lk a:hover{color:var(--navy);}
+table.cmp td.nm{white-space:nowrap;}
+table.cmp.tools td,table.cmp.tools th{font-size:.9rem;padding:.45rem .7rem;}
+.cnt{font-size:.85rem;color:var(--text2);margin-top:.5rem;}
+</style>
+</head>
+<body>
+<div class="progress-wrap"><div id="progress"></div></div>
+<button class="navbtn" id="prevBtn">&lsaquo;</button>
+<button class="navbtn" id="nextBtn">&rsaquo;</button>
+<button class="pdf-btn" id="pdfBtn" title="Raccourci clavier : P">&#11015; Exporter en PDF</button>
+<div id="counter">1 / 1</div>
+<div class="brand-mark">IA POUR LES DÉVELOPPEURS · BOÎTE À OUTILS 2026</div>
+<div class="deck">
+<section class="slide slide-cover active">
+  <div class="cover-org">Boîte à outils · formation « L'IA pour les développeurs »</div>
+  <div class="cover-title">Outils, skills, harnais, moteurs d'inférence et dépôts à connaître</div>
+  <div class="cover-sub">GGUF, Hugging Face, MCP, agents, RAG, fine-tuning, évaluation : 233 entrées classées par besoin, avec le lien de chaque dépôt.</div>
+  <div class="cover-meta">
+    <span><b>Public</b>Développeurs</span>
+    <span><b>Usage</b>Référence à consulter avant, pendant, après</span>
+    <span><b>Édition</b>Novembre 2026</span>
+    <span><b>Sections</b>14 catégories</span>
+  </div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Mode d'emploi</div>
+  <h2 class="slide-title">Comment utiliser ce support</h2>
+  <ul class="points">
+    <li>Chaque catégorie suit le même rythme : <b>une slide de titre</b>, des <b>tableaux de 7 entrées</b>, une slide <b>« à retenir »</b>, une <b>question pour le groupe</b>.</li>
+    <li>Chaque ligne donne : <b>le nom</b>, <b>le lien direct</b> (GitHub ou Hugging Face), et <b>ce qu'il faut savoir en une phrase</b>.</li>
+    <li>Les liens sont cliquables dans le navigateur. Le bouton en haut à droite exporte tout en PDF.</li>
+    <li>Les slides de synthèse (choix d'un moteur, tailles mémoire, commandes) se trouvent dans les sections 05 et 09.</li>
+  </ul>
+  <div class="warn"><b>Données à revérifier avant chaque session</b> : versions, étoiles GitHub, licences et disponibilité des modèles changent chaque mois. Les points signalés « à vérifier » reposent sur des comparatifs publiés entre mai et octobre 2026, pas sur une lecture directe de chaque dépôt.</div>
+  <div class="amorce">💬 Parmi les catégories du plan, laquelle connaissez-vous le moins ? On commencera par celle-là.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Plan</div>
+  <h2 class="slide-title">Quatorze catégories, du poste de travail au produit</h2>
+  <table class="cmp tools"><tr><th>N°</th><th>Catégorie</th><th>Entrées</th></tr><tr><td><b>01</b></td><td>Harnais et agents de code</td><td>20</td></tr><tr><td><b>02</b></td><td>Skills, plugins et méthodes pour agents</td><td>19</td></tr><tr><td><b>03</b></td><td>MCP et protocoles d&#x27;agents</td><td>16</td></tr><tr><td><b>04</b></td><td>Frameworks d&#x27;agents et orchestration</td><td>20</td></tr><tr><td><b>05</b></td><td>Moteurs d&#x27;inférence et runtimes</td><td>20</td></tr><tr><td><b>06</b></td><td>Interfaces, passerelles et routeurs de modèles</td><td>10</td></tr><tr><td><b>07</b></td><td>Hugging Face, GGUF et outils du Hub</td><td>20</td></tr><tr><td><b>08</b></td><td>Modèles ouverts à connaître</td><td>15</td></tr><tr><td><b>09</b></td><td>Formats et quantification</td><td>10</td></tr><tr><td><b>10</b></td><td>RAG, embeddings, bases vectorielles et mémoire</td><td>25</td></tr><tr><td><b>11</b></td><td>Fine-tuning et entraînement</td><td>12</td></tr><tr><td><b>12</b></td><td>Évaluation, observabilité et sécurité</td><td>18</td></tr><tr><td><b>13</b></td><td>Navigateur, sandbox, voix et image</td><td>12</td></tr><tr><td><b>14</b></td><td>Apprendre et rester à jour</td><td>16</td></tr></table>
+  <div class="cnt">Total : 233 entrées, plus les synthèses (choix de moteur, mémoire, quantification, commandes).</div>
+  <div class="amorce">💬 Dans quelle catégorie votre équipe a-t-elle déjà fait un choix, sans l'avoir comparé à ces alternatives ?</div>
+</section>
+<section class="slide slide-divider">
+  <div class="section-num">01</div>
+  <div class="section-tag">Section 01</div>
+  <h1 class="section-title">Harnais et agents de code</h1>
+  <p class="section-sub">Le « harnais » est la boucle autour du modèle : outils, permissions, contexte, mémoire</p>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 01 · principe</div>
+  <h2 class="slide-title">Harnais et agents de code : de quoi parle-t-on ?</h2>
+  <div class="note" style="margin-top:0">Un harnais d&#x27;agent donne au modèle un terminal, des fichiers, des permissions et une boucle de correction. Deux harnais avec le même modèle donnent des résultats très différents.</div>
+  <div class="cnt">20 entrées dans cette section, présentées par tableaux de 7.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 01 · Harnais et agents de code · 1/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Harnais et agents de code</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Claude Code</b></td><td class="lk"><a href="https://github.com/anthropics/claude-code" target="_blank" rel="noopener">anthropics/claude-code</a></td><td>Agent en terminal d&#x27;Anthropic : plan mode, sous-agents, hooks, CLAUDE.md, MCP. Le dépôt public sert de suivi et de documentation, pas de code source complet.</td></tr><tr><td class="nm"><b>Codex CLI</b></td><td class="lk"><a href="https://github.com/openai/codex" target="_blank" rel="noopener">openai/codex</a></td><td>Agent terminal d&#x27;OpenAI, open source (Apache 2.0), écrit en Rust : sandbox, modes d&#x27;approbation, AGENTS.md.</td></tr><tr><td class="nm"><b>OpenCode</b></td><td class="lk"><a href="https://opencode.ai" target="_blank" rel="noopener">opencode.ai</a></td><td>Le harnais open source le plus étoilé de 2026 (MIT), 75+ fournisseurs de modèles, architecture client/serveur, accepte les modèles locaux.</td></tr><tr><td class="nm"><b>Pi</b></td><td class="lk"><a href="https://pinggy.io/blog/best_open_source_cli_coding_agents/" target="_blank" rel="noopener">article de référence</a></td><td>Harnais minimaliste (prompt système sous 1 000 tokens, « lazy skills »), conçu pour être forké. À lire pour comprendre ce qu&#x27;est un harnais.</td></tr><tr><td class="nm"><b>Aider</b></td><td class="lk"><a href="https://github.com/Aider-AI/aider" target="_blank" rel="noopener">Aider-AI/aider</a></td><td>Le pionnier (2023) : pair programming dans le terminal, très centré Git, commits automatiques.</td></tr><tr><td class="nm"><b>OpenHands</b></td><td class="lk"><a href="https://github.com/All-Hands-AI/OpenHands" target="_blank" rel="noopener">All-Hands-AI/OpenHands</a></td><td>Agent autonome le plus mature en open source (ex-OpenDevin) : architecture événementielle, exécution en conteneur.</td></tr><tr><td class="nm"><b>Cline</b></td><td class="lk"><a href="https://github.com/cline/cline" target="_blank" rel="noopener">cline/cline</a></td><td>Agent open source pour VS Code (Apache 2.0) : validation de chaque action, MCP, modèles locaux.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 01 · Harnais et agents de code · 2/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Harnais et agents de code</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Roo Code</b></td><td class="lk"><a href="https://github.com/RooCodeInc/Roo-Code" target="_blank" rel="noopener">RooCodeInc/Roo-Code</a></td><td>Fork de Cline avec des modes (architecte, code, debug) et des profils de modèles.</td></tr><tr><td class="nm"><b>Kilo Code</b></td><td class="lk"><a href="https://github.com/Kilo-Org/kilocode" target="_blank" rel="noopener">Kilo-Org/kilocode</a></td><td>Agent VS Code et CLI (MIT) qui reprend les meilleures idées de Cline et Roo.</td></tr><tr><td class="nm"><b>Goose</b></td><td class="lk"><a href="https://github.com/block/goose" target="_blank" rel="noopener">block/goose</a></td><td>Agent local extensible par MCP, issu de Block, passé sous gouvernance Linux Foundation.</td></tr><tr><td class="nm"><b>Crush</b></td><td class="lk"><a href="https://github.com/charmbracelet/crush" target="_blank" rel="noopener">charmbracelet/crush</a></td><td>Agent terminal soigné de Charm : interface TUI, multi-modèles, MCP.</td></tr><tr><td class="nm"><b>Qwen Code</b></td><td class="lk"><a href="https://github.com/QwenLM/qwen-code" target="_blank" rel="noopener">QwenLM/qwen-code</a></td><td>CLI d&#x27;Alibaba optimisé pour les modèles Qwen-Coder, y compris en local.</td></tr><tr><td class="nm"><b>Continue</b></td><td class="lk"><a href="https://github.com/continuedev/continue" target="_blank" rel="noopener">continuedev/continue</a></td><td>Extension open source VS Code/JetBrains : vous branchez n&#x27;importe quel modèle, dont un modèle local. Voir slide Copilot du Jour 1.</td></tr><tr><td class="nm"><b>Plandex</b></td><td class="lk"><a href="https://github.com/plandex-ai/plandex" target="_blank" rel="noopener">plandex-ai/plandex</a></td><td>Agent terminal pour tâches longues sur gros dépôts, avec bac à sable de changements.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 01 · Harnais et agents de code · 3/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Harnais et agents de code</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>SWE-agent</b></td><td class="lk"><a href="https://github.com/SWE-agent/SWE-agent" target="_blank" rel="noopener">SWE-agent/SWE-agent</a></td><td>Agent de recherche de Princeton/Stanford, référence du benchmark SWE-bench.</td></tr><tr><td class="nm"><b>mini-swe-agent</b></td><td class="lk"><a href="https://github.com/SWE-agent/mini-swe-agent" target="_blank" rel="noopener">SWE-agent/mini-swe-agent</a></td><td>Version minimale (~100 lignes) du même principe : parfaite pour démonter une boucle d&#x27;agent en cours.</td></tr><tr><td class="nm"><b>GitHub Copilot CLI</b></td><td class="lk"><a href="https://github.com/github/copilot-cli" target="_blank" rel="noopener">github/copilot-cli</a></td><td>L&#x27;agent terminal de GitHub, dans la continuité du mode agent de Copilot vu au Jour 1.</td></tr><tr><td class="nm"><b>Gemini CLI → Antigravity CLI</b></td><td class="lk"><a href="https://github.com/google-gemini/gemini-cli" target="_blank" rel="noopener">google-gemini/gemini-cli</a></td><td>À vérifier : selon Pinggy, le dépôt open source Gemini CLI a cessé de servir en juin 2026, remplacé par Antigravity CLI (fermé).</td></tr><tr><td class="nm"><b>Tabby</b></td><td class="lk"><a href="https://github.com/TabbyML/tabby" target="_blank" rel="noopener">TabbyML/tabby</a></td><td>Assistant de complétion auto-hébergé : alternative privée à Copilot pour les équipes.</td></tr><tr><td class="nm"><b>learn-claude-code</b></td><td class="lk"><a href="https://github.com/shareAI-lab/learn-claude-code" target="_blank" rel="noopener">shareAI-lab/learn-claude-code</a></td><td>Reconstruit un harnais « à la Claude Code » depuis zéro en Bash : excellent support pédagogique.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">À retenir · Harnais et agents de code</div>
+  <h2 class="slide-title">Ce qu'il faut garder de la section 01</h2>
+  <ul class="points"><li>Choisir un harnais, c'est choisir : <b>qui valide chaque action</b>, <b>où tourne le code</b> et <b>quels modèles</b> on peut brancher.</li><li>Un harnais ouvert (OpenCode, Cline, Aider, Codex) permet de passer d'un modèle cloud à un modèle local sans changer de méthode de travail.</li><li>Le paysage bouge tous les trimestres : vérifiez la <b>date du dernier commit</b> avant d'adopter, pas le nombre d'étoiles.</li></ul>
+</section>
+<section class="slide slide-question">
+  <div class="q-tag">💬 Question de relance · section 01</div>
+  <div class="q-question">Entre un harnais fermé très abouti et un harnais ouvert que vous pouvez lire et forker, lequel défendriez-vous devant votre DSI ?</div>
+</section>
+<section class="slide slide-divider">
+  <div class="section-num">02</div>
+  <div class="section-tag">Section 02</div>
+  <h1 class="section-title">Skills, plugins et méthodes pour agents</h1>
+  <p class="section-sub">Des dossiers d&#x27;instructions réutilisables : SKILL.md, AGENTS.md, plugins, spécifications</p>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 02 · principe</div>
+  <h2 class="slide-title">Skills, plugins et méthodes pour agents : de quoi parle-t-on ?</h2>
+  <div class="note" style="margin-top:0">Un skill est un dossier contenant un fichier SKILL.md (frontmatter + instructions) chargé à la demande. Le format est devenu un standard ouvert, lisible par plusieurs harnais.</div>
+  <div class="cnt">19 entrées dans cette section, présentées par tableaux de 7.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 02 · Skills, plugins et méthodes pour agents · 1/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Skills, plugins et méthodes pour agents</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>anthropics/skills</b></td><td class="lk"><a href="https://github.com/anthropics/skills" target="_blank" rel="noopener">anthropics/skills</a></td><td>Dépôt officiel : la spécification, un gabarit, skill-creator et les skills de documents (docx, pdf, pptx, xlsx).</td></tr><tr><td class="nm"><b>Agent Skills (standard)</b></td><td class="lk"><a href="https://agentskills.io" target="_blank" rel="noopener">agentskills.io</a></td><td>Site et spécification ouverte du format SKILL.md, compatible avec plusieurs agents.</td></tr><tr><td class="nm"><b>agentskills/agentskills</b></td><td class="lk"><a href="https://github.com/agentskills/agentskills" target="_blank" rel="noopener">agentskills/agentskills</a></td><td>Le dépôt de gouvernance du standard Agent Skills.</td></tr><tr><td class="nm"><b>AGENTS.md</b></td><td class="lk"><a href="https://github.com/agentsmd/agents.md" target="_blank" rel="noopener">agentsmd/agents.md</a></td><td>Fichier de consignes pour agents (équivalent universel de CLAUDE.md), lu par Codex, Copilot, Cursor et d&#x27;autres.</td></tr><tr><td class="nm"><b>obra/superpowers</b></td><td class="lk"><a href="https://github.com/obra/superpowers" target="_blank" rel="noopener">obra/superpowers</a></td><td>Bibliothèque de skills de méthode : brainstorm, plan, TDD, revue. Très cité comme point de départ.</td></tr><tr><td class="nm"><b>everything-claude-code</b></td><td class="lk"><a href="https://github.com/affaan-m/everything-claude-code" target="_blank" rel="noopener">affaan-m/everything-claude-code</a></td><td>Système d&#x27;optimisation de harnais : skills, mémoire, sécurité, hooks, pour Claude Code, Codex, OpenCode, Cursor.</td></tr><tr><td class="nm"><b>wshobson/agents</b></td><td class="lk"><a href="https://github.com/wshobson/agents" target="_blank" rel="noopener">wshobson/agents</a></td><td>Marketplace de plugins multi-harnais : agents spécialisés, commandes, skills.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 02 · Skills, plugins et méthodes pour agents · 2/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Skills, plugins et méthodes pour agents</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>VoltAgent/awesome-agent-skills</b></td><td class="lk"><a href="https://github.com/VoltAgent/awesome-agent-skills" target="_blank" rel="noopener">VoltAgent/awesome-agent-skills</a></td><td>Liste curatée de skills issus d&#x27;équipes réelles (1 000+), par éditeur.</td></tr><tr><td class="nm"><b>ComposioHQ/awesome-claude-skills</b></td><td class="lk"><a href="https://github.com/ComposioHQ/awesome-claude-skills" target="_blank" rel="noopener">ComposioHQ/awesome-claude-skills</a></td><td>Autre catalogue de skills, orienté intégrations d&#x27;applications.</td></tr><tr><td class="nm"><b>hesreallyhim/awesome-claude-code</b></td><td class="lk"><a href="https://github.com/hesreallyhim/awesome-claude-code" target="_blank" rel="noopener">hesreallyhim/awesome-claude-code</a></td><td>La liste de référence : skills, hooks, commandes, orchestrateurs, plugins pour Claude Code.</td></tr><tr><td class="nm"><b>github/awesome-copilot</b></td><td class="lk"><a href="https://github.com/github/awesome-copilot" target="_blank" rel="noopener">github/awesome-copilot</a></td><td>Liste officielle GitHub : instructions, prompts, agents et skills pour Copilot.</td></tr><tr><td class="nm"><b>antigravity-awesome-skills</b></td><td class="lk"><a href="https://github.com/sickn33/antigravity-awesome-skills" target="_blank" rel="noopener">sickn33/antigravity-awesome-skills</a></td><td>Bibliothèque installable de 1 500+ skills avec CLI d&#x27;installation et lots thématiques. Qualité inégale : trier.</td></tr><tr><td class="nm"><b>OpenSkills</b></td><td class="lk"><a href="https://github.com/numman-ali/openskills" target="_blank" rel="noopener">numman-ali/openskills</a></td><td>CLI qui installe des skills depuis GitHub et les synchronise dans AGENTS.md pour les agents qui n&#x27;ont pas le format natif.</td></tr><tr><td class="nm"><b>skills.sh</b></td><td class="lk"><a href="https://skills.sh" target="_blank" rel="noopener">skills.sh</a></td><td>Classement Vercel des skills les plus installés (commande « npx skills »).</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 02 · Skills, plugins et méthodes pour agents · 3/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Skills, plugins et méthodes pour agents</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>K-Dense scientific skills</b></td><td class="lk"><a href="https://github.com/K-Dense-AI/scientific-agent-skills" target="_blank" rel="noopener">K-Dense-AI/scientific-agent-skills</a></td><td>Plus de 150 skills pour la recherche scientifique : bonne illustration d&#x27;un skill métier.</td></tr><tr><td class="nm"><b>GitHub Spec Kit</b></td><td class="lk"><a href="https://github.com/github/spec-kit" target="_blank" rel="noopener">github/spec-kit</a></td><td>Développement piloté par la spécification : constitution, spec, plan, tâches, puis implémentation par l&#x27;agent.</td></tr><tr><td class="nm"><b>BMAD-METHOD</b></td><td class="lk"><a href="https://github.com/bmad-code-org/BMAD-METHOD" target="_blank" rel="noopener">bmad-code-org/BMAD-METHOD</a></td><td>Méthode multi-rôles (PM, architecte, dev, QA) jouée par des agents.</td></tr><tr><td class="nm"><b>Claude Agent SDK (Python)</b></td><td class="lk"><a href="https://github.com/anthropics/claude-agent-sdk-python" target="_blank" rel="noopener">anthropics/claude-agent-sdk-python</a></td><td>Le harnais de Claude Code utilisable comme bibliothèque pour construire ses propres agents.</td></tr><tr><td class="nm"><b>Claude Agent SDK (TypeScript)</b></td><td class="lk"><a href="https://github.com/anthropics/claude-agent-sdk-typescript" target="_blank" rel="noopener">anthropics/claude-agent-sdk-typescript</a></td><td>Même chose côté Node/TypeScript.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">À retenir · Skills, plugins et méthodes pour agents</div>
+  <h2 class="slide-title">Ce qu'il faut garder de la section 02</h2>
+  <ul class="points"><li>Un skill bien écrit tient dans un <b>dossier + un SKILL.md de moins de 500 lignes</b> ; le détail va dans des fichiers annexes chargés à la demande (<i>progressive disclosure</i>).</li><li>Les catalogues contiennent beaucoup de contenu généré en masse : <b>lisez le SKILL.md avant d'installer</b>, comme vous liriez une dépendance.</li><li>Un skill peut exécuter des scripts : c'est une surface d'attaque. Mêmes réflexes que pour un paquet npm ou pip.</li></ul>
+</section>
+<section class="slide slide-question">
+  <div class="q-tag">💬 Question de relance · section 02</div>
+  <div class="q-question">Quelle procédure répétitive de votre métier mériterait de devenir un skill que toute l&#x27;équipe réutilise ?</div>
+</section>
+<section class="slide slide-divider">
+  <div class="section-num">03</div>
+  <div class="section-tag">Section 03</div>
+  <h1 class="section-title">MCP et protocoles d&#x27;agents</h1>
+  <p class="section-sub">Brancher le modèle sur des outils et des données sans réécrire l&#x27;intégration</p>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 03 · principe</div>
+  <h2 class="slide-title">MCP et protocoles d&#x27;agents : de quoi parle-t-on ?</h2>
+  <div class="note" style="margin-top:0">Le Model Context Protocol (MCP) normalise la façon dont un agent découvre et appelle des outils. Un serveur MCP écrit une fois fonctionne avec tous les clients compatibles.</div>
+  <div class="cnt">16 entrées dans cette section, présentées par tableaux de 7.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 03 · MCP et protocoles d&#x27;agents · 1/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">MCP et protocoles d&#x27;agents</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Spécification MCP</b></td><td class="lk"><a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">modelcontextprotocol.io</a></td><td>Documentation et spécification officielles du protocole.</td></tr><tr><td class="nm"><b>modelcontextprotocol/servers</b></td><td class="lk"><a href="https://github.com/modelcontextprotocol/servers" target="_blank" rel="noopener">modelcontextprotocol/servers</a></td><td>Serveurs de référence (fichiers, Git, fetch, mémoire…) : le meilleur endroit pour lire du code MCP.</td></tr><tr><td class="nm"><b>MCP Python SDK</b></td><td class="lk"><a href="https://github.com/modelcontextprotocol/python-sdk" target="_blank" rel="noopener">modelcontextprotocol/python-sdk</a></td><td>SDK officiel Python : base du jour 3 (serveur MCP par entrée standard).</td></tr><tr><td class="nm"><b>MCP TypeScript SDK</b></td><td class="lk"><a href="https://github.com/modelcontextprotocol/typescript-sdk" target="_blank" rel="noopener">modelcontextprotocol/typescript-sdk</a></td><td>SDK officiel TypeScript.</td></tr><tr><td class="nm"><b>FastMCP</b></td><td class="lk"><a href="https://github.com/jlowin/fastmcp" target="_blank" rel="noopener">jlowin/fastmcp</a></td><td>Façon la plus rapide d&#x27;écrire un serveur MCP en Python avec des décorateurs.</td></tr><tr><td class="nm"><b>MCP Inspector</b></td><td class="lk"><a href="https://github.com/modelcontextprotocol/inspector" target="_blank" rel="noopener">modelcontextprotocol/inspector</a></td><td>Outil visuel pour tester et déboguer un serveur MCP avant de le brancher à un agent.</td></tr><tr><td class="nm"><b>MCP Registry</b></td><td class="lk"><a href="https://registry.modelcontextprotocol.io" target="_blank" rel="noopener">registry.modelcontextprotocol.io</a></td><td>Registre officiel des serveurs publiés.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 03 · MCP et protocoles d&#x27;agents · 2/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">MCP et protocoles d&#x27;agents</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>awesome-mcp-servers</b></td><td class="lk"><a href="https://github.com/punkpeye/awesome-mcp-servers" target="_blank" rel="noopener">punkpeye/awesome-mcp-servers</a></td><td>Catalogue communautaire géant (des milliers d&#x27;entrées). Une carte, pas une recommandation : environ la moitié de l&#x27;écosystème serait inactif.</td></tr><tr><td class="nm"><b>GitHub MCP Server</b></td><td class="lk"><a href="https://github.com/github/github-mcp-server" target="_blank" rel="noopener">github/github-mcp-server</a></td><td>Issues, PR, recherche de code depuis un agent. Serveur d&#x27;éditeur, maintenu.</td></tr><tr><td class="nm"><b>Playwright MCP</b></td><td class="lk"><a href="https://github.com/microsoft/playwright-mcp" target="_blank" rel="noopener">microsoft/playwright-mcp</a></td><td>Pilotage de navigateur par l&#x27;agent : tests, extraction, vérification visuelle.</td></tr><tr><td class="nm"><b>Context7</b></td><td class="lk"><a href="https://github.com/upstash/context7" target="_blank" rel="noopener">upstash/context7</a></td><td>Injecte la documentation à jour des bibliothèques dans le contexte : remède direct aux API inventées.</td></tr><tr><td class="nm"><b>Firecrawl MCP</b></td><td class="lk"><a href="https://github.com/firecrawl/firecrawl-mcp-server" target="_blank" rel="noopener">firecrawl/firecrawl-mcp-server</a></td><td>Crawl et extraction web en Markdown propre pour l&#x27;agent.</td></tr><tr><td class="nm"><b>Figma Context MCP</b></td><td class="lk"><a href="https://github.com/GLips/Figma-Context-MCP" target="_blank" rel="noopener">GLips/Figma-Context-MCP</a></td><td>Donne à l&#x27;agent la structure d&#x27;une maquette Figma pour générer l&#x27;interface.</td></tr><tr><td class="nm"><b>Supabase MCP</b></td><td class="lk"><a href="https://github.com/supabase-community/supabase-mcp" target="_blank" rel="noopener">supabase-community/supabase-mcp</a></td><td>Requêtes et migrations de base Postgres depuis l&#x27;agent (à restreindre en lecture seule).</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 03 · MCP et protocoles d&#x27;agents · 3/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">MCP et protocoles d&#x27;agents</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>AWS MCP Servers</b></td><td class="lk"><a href="https://github.com/awslabs/mcp" target="_blank" rel="noopener">awslabs/mcp</a></td><td>Ensemble de serveurs pour documentation et services AWS.</td></tr><tr><td class="nm"><b>A2A (Agent2Agent)</b></td><td class="lk"><a href="https://github.com/a2aproject/A2A" target="_blank" rel="noopener">a2aproject/A2A</a></td><td>Protocole d&#x27;échange entre agents de fournisseurs différents, complémentaire de MCP (outils) : il parle d&#x27;agent à agent.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">À retenir · MCP et protocoles d&#x27;agents</div>
+  <h2 class="slide-title">Ce qu'il faut garder de la section 03</h2>
+  <ul class="points"><li>MCP = <b>agent ↔ outils</b>. A2A = <b>agent ↔ agent</b>. AGENTS.md / SKILL.md = <b>agent ↔ consignes</b>.</li><li>Les serveurs d'éditeur (GitHub, Microsoft, Figma) sont les plus fiables ; les petits serveurs communautaires sont à auditer.</li><li>Chaque serveur ajouté consomme du contexte avec ses descriptions d'outils : <b>moins de serveurs, mieux choisis</b>.</li></ul>
+</section>
+<section class="slide slide-question">
+  <div class="q-tag">💬 Question de relance · section 03</div>
+  <div class="q-question">Un serveur MCP accède à votre base de données : quelles permissions lui donnez-vous, et qui les relit ?</div>
+</section>
+<section class="slide slide-divider">
+  <div class="section-num">04</div>
+  <div class="section-tag">Section 04</div>
+  <h1 class="section-title">Frameworks d&#x27;agents et orchestration</h1>
+  <p class="section-sub">Quand l&#x27;agent n&#x27;est pas un outil mais un composant de votre produit</p>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 04 · principe</div>
+  <h2 class="slide-title">Frameworks d&#x27;agents et orchestration : de quoi parle-t-on ?</h2>
+  <div class="note" style="margin-top:0">Ces bibliothèques servent à construire vos propres agents : boucle outils, état, reprise sur erreur, multi-agents, traces.</div>
+  <div class="cnt">20 entrées dans cette section, présentées par tableaux de 7.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 04 · Frameworks d&#x27;agents et orchestration · 1/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Frameworks d&#x27;agents et orchestration</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>LangGraph</b></td><td class="lk"><a href="https://github.com/langchain-ai/langgraph" target="_blank" rel="noopener">langchain-ai/langgraph</a></td><td>Graphes d&#x27;états pour agents persistants : le plus déployé en production selon plusieurs comparatifs 2026.</td></tr><tr><td class="nm"><b>LangChain</b></td><td class="lk"><a href="https://github.com/langchain-ai/langchain" target="_blank" rel="noopener">langchain-ai/langchain</a></td><td>Boîte à outils historique : connecteurs, chaînes, intégrations.</td></tr><tr><td class="nm"><b>OpenAI Agents SDK</b></td><td class="lk"><a href="https://github.com/openai/openai-agents-python" target="_blank" rel="noopener">openai/openai-agents-python</a></td><td>SDK minimaliste (agents, handoffs, garde-fous, traces), MIT, Python et TypeScript.</td></tr><tr><td class="nm"><b>Pydantic AI</b></td><td class="lk"><a href="https://github.com/pydantic/pydantic-ai" target="_blank" rel="noopener">pydantic/pydantic-ai</a></td><td>Agents typés façon FastAPI : sorties validées par Pydantic, MCP natif, indépendant du modèle.</td></tr><tr><td class="nm"><b>CrewAI</b></td><td class="lk"><a href="https://github.com/crewAIInc/crewAI" target="_blank" rel="noopener">crewAIInc/crewAI</a></td><td>Équipes d&#x27;agents à rôles : le plus rapide pour un prototype multi-agents (Python).</td></tr><tr><td class="nm"><b>Mastra</b></td><td class="lk"><a href="https://github.com/mastra-ai/mastra" target="_blank" rel="noopener">mastra-ai/mastra</a></td><td>Framework TypeScript complet (agents, workflows, mémoire, évaluations).</td></tr><tr><td class="nm"><b>Microsoft Agent Framework</b></td><td class="lk"><a href="https://github.com/microsoft/agent-framework" target="_blank" rel="noopener">microsoft/agent-framework</a></td><td>Fusion d&#x27;AutoGen et Semantic Kernel : .NET et Python, orienté Azure mais multi-fournisseurs.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 04 · Frameworks d&#x27;agents et orchestration · 2/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Frameworks d&#x27;agents et orchestration</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Google ADK</b></td><td class="lk"><a href="https://github.com/google/adk-python" target="_blank" rel="noopener">google/adk-python</a></td><td>Agent Development Kit de Google : multimodal, A2A natif, déploiement GCP.</td></tr><tr><td class="nm"><b>smolagents</b></td><td class="lk"><a href="https://github.com/huggingface/smolagents" target="_blank" rel="noopener">huggingface/smolagents</a></td><td>Bibliothèque minuscule de Hugging Face : agents qui écrivent du code. Idéale pour apprendre.</td></tr><tr><td class="nm"><b>Strands Agents</b></td><td class="lk"><a href="https://github.com/strands-agents/sdk-python" target="_blank" rel="noopener">strands-agents/sdk-python</a></td><td>SDK AWS open source, intégré à Bedrock AgentCore.</td></tr><tr><td class="nm"><b>LlamaIndex</b></td><td class="lk"><a href="https://github.com/run-llama/llama_index" target="_blank" rel="noopener">run-llama/llama_index</a></td><td>Orienté données et documents : RAG et agents documentaires.</td></tr><tr><td class="nm"><b>Haystack</b></td><td class="lk"><a href="https://github.com/deepset-ai/haystack" target="_blank" rel="noopener">deepset-ai/haystack</a></td><td>Pipelines RAG en production, très lisibles.</td></tr><tr><td class="nm"><b>Agno</b></td><td class="lk"><a href="https://github.com/agno-agi/agno" target="_blank" rel="noopener">agno-agi/agno</a></td><td>Ex-Phidata : agents Python avec mémoire, connaissances et 100+ outils.</td></tr><tr><td class="nm"><b>AG2 (AutoGen)</b></td><td class="lk"><a href="https://github.com/ag2ai/ag2" target="_blank" rel="noopener">ag2ai/ag2</a></td><td>Suite communautaire d&#x27;AutoGen. AutoGen d&#x27;origine est en maintenance : migrer vers Agent Framework, CrewAI ou LangGraph.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 04 · Frameworks d&#x27;agents et orchestration · 3/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Frameworks d&#x27;agents et orchestration</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Vercel AI SDK</b></td><td class="lk"><a href="https://github.com/vercel/ai" target="_blank" rel="noopener">vercel/ai</a></td><td>Toolkit TypeScript pour applications web avec streaming et agents.</td></tr><tr><td class="nm"><b>Instructor</b></td><td class="lk"><a href="https://github.com/jxnl/instructor" target="_blank" rel="noopener">jxnl/instructor</a></td><td>Sorties structurées validées par Pydantic depuis n&#x27;importe quel modèle : le geste le plus utile du jour 2.</td></tr><tr><td class="nm"><b>Dify</b></td><td class="lk"><a href="https://github.com/langgenius/dify" target="_blank" rel="noopener">langgenius/dify</a></td><td>Plateforme low-code pour applications LLM, agents et RAG, auto-hébergeable.</td></tr><tr><td class="nm"><b>n8n</b></td><td class="lk"><a href="https://github.com/n8n-io/n8n" target="_blank" rel="noopener">n8n-io/n8n</a></td><td>Automatisation par workflows avec nœuds IA : pour les équipes non développeuses.</td></tr><tr><td class="nm"><b>Langflow</b></td><td class="lk"><a href="https://github.com/langflow-ai/langflow" target="_blank" rel="noopener">langflow-ai/langflow</a></td><td>Constructeur visuel de flux d&#x27;agents et de RAG.</td></tr><tr><td class="nm"><b>Flowise</b></td><td class="lk"><a href="https://github.com/FlowiseAI/Flowise" target="_blank" rel="noopener">FlowiseAI/Flowise</a></td><td>Autre constructeur visuel open source, très simple à lancer.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">À retenir · Frameworks d&#x27;agents et orchestration</div>
+  <h2 class="slide-title">Ce qu'il faut garder de la section 04</h2>
+  <ul class="points"><li>Beaucoup de projets n'ont <b>pas besoin d'un framework</b> : une boucle de 50 lignes + un SDK de modèle suffisent (voir smolagents, mini-swe-agent).</li><li>Critères de choix : <b>état persistant</b>, <b>MCP natif</b>, <b>traces OpenTelemetry</b>, <b>licence</b> et <b>date du dernier commit</b>.</li><li>Les étoiles sont un indicateur retardé : LangGraph en a moins que LangChain mais plus de déploiements.</li></ul>
+</section>
+<section class="slide slide-question">
+  <div class="q-tag">💬 Question de relance · section 04</div>
+  <div class="q-question">Votre premier agent a-t-il besoin d&#x27;un framework, ou d&#x27;une boucle de cinquante lignes que toute l&#x27;équipe comprend ?</div>
+</section>
+<section class="slide slide-divider">
+  <div class="section-num">05</div>
+  <div class="section-tag">Section 05</div>
+  <h1 class="section-title">Moteurs d&#x27;inférence et runtimes</h1>
+  <p class="section-sub">Ce qui fait réellement tourner un modèle : local, serveur, Apple Silicon, GPU</p>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 05 · principe</div>
+  <h2 class="slide-title">Moteurs d&#x27;inférence et runtimes : de quoi parle-t-on ?</h2>
+  <div class="note" style="margin-top:0">Un moteur lit un format de modèle et produit des tokens. Ollama et LM Studio sont des habillages de llama.cpp ; vLLM et SGLang sont des moteurs de serveur.</div>
+  <div class="cnt">20 entrées dans cette section, présentées par tableaux de 7.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 05 · Moteurs d&#x27;inférence et runtimes · 1/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Moteurs d&#x27;inférence et runtimes</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>llama.cpp</b></td><td class="lk"><a href="https://github.com/ggml-org/llama.cpp" target="_blank" rel="noopener">ggml-org/llama.cpp</a></td><td>Le moteur de référence (C/C++, MIT) : CPU, Metal, CUDA, Vulkan, ROCm. Définit GGUF. Fournit llama-server (API compatible OpenAI).</td></tr><tr><td class="nm"><b>ggml</b></td><td class="lk"><a href="https://github.com/ggml-org/ggml" target="_blank" rel="noopener">ggml-org/ggml</a></td><td>Bibliothèque tensorielle sous llama.cpp et whisper.cpp ; contient la spécification du format GGUF.</td></tr><tr><td class="nm"><b>Ollama</b></td><td class="lk"><a href="https://github.com/ollama/ollama" target="_blank" rel="noopener">ollama/ollama</a></td><td>Installation en une commande, catalogue de modèles, API locale sur le port 11434. Le choix par défaut du développeur.</td></tr><tr><td class="nm"><b>LM Studio</b></td><td class="lk"><a href="https://lmstudio.ai" target="_blank" rel="noopener">lmstudio.ai</a></td><td>Application graphique propriétaire : catalogue Hugging Face, serveur local, backend MLX sur Mac. Idéale en formation.</td></tr><tr><td class="nm"><b>vLLM</b></td><td class="lk"><a href="https://github.com/vllm-project/vllm" target="_blank" rel="noopener">vllm-project/vllm</a></td><td>Standard du serveur multi-utilisateurs sur GPU : PagedAttention, batching continu, quantifications AWQ/GPTQ/FP8.</td></tr><tr><td class="nm"><b>SGLang</b></td><td class="lk"><a href="https://github.com/sgl-project/sglang" target="_blank" rel="noopener">sgl-project/sglang</a></td><td>Concurrent de vLLM, fort sur la latence, les sorties structurées et les flux d&#x27;agents (cache de préfixes).</td></tr><tr><td class="nm"><b>MLX / mlx-lm</b></td><td class="lk"><a href="https://github.com/ml-explore/mlx-lm" target="_blank" rel="noopener">ml-explore/mlx-lm</a></td><td>Moteur d&#x27;Apple pour puces M-series : génération et fine-tuning, souvent le plus rapide sur Mac.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 05 · Moteurs d&#x27;inférence et runtimes · 2/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Moteurs d&#x27;inférence et runtimes</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>ExLlamaV3</b></td><td class="lk"><a href="https://github.com/turboderp-org/exllamav3" target="_blank" rel="noopener">turboderp-org/exllamav3</a></td><td>Moteur GPU NVIDIA pour usage personnel, format EXL3, très bon rapport qualité/VRAM.</td></tr><tr><td class="nm"><b>TensorRT-LLM</b></td><td class="lk"><a href="https://github.com/NVIDIA/TensorRT-LLM" target="_blank" rel="noopener">NVIDIA/TensorRT-LLM</a></td><td>Performances maximales sur infrastructure 100 % NVIDIA, au prix d&#x27;une mise en place lourde.</td></tr><tr><td class="nm"><b>ik_llama.cpp</b></td><td class="lk"><a href="https://github.com/ikawrakow/ik_llama.cpp" target="_blank" rel="noopener">ikawrakow/ik_llama.cpp</a></td><td>Fork de llama.cpp orienté CPU et quantifications avancées.</td></tr><tr><td class="nm"><b>KoboldCpp</b></td><td class="lk"><a href="https://github.com/LostRuins/koboldcpp" target="_blank" rel="noopener">LostRuins/koboldcpp</a></td><td>Un seul exécutable basé sur llama.cpp, interface de chat et de fiction.</td></tr><tr><td class="nm"><b>llamafile</b></td><td class="lk"><a href="https://github.com/Mozilla-Ocho/llamafile" target="_blank" rel="noopener">Mozilla-Ocho/llamafile</a></td><td>Un modèle + un moteur dans un seul fichier exécutable : démonstration très parlante.</td></tr><tr><td class="nm"><b>LocalAI</b></td><td class="lk"><a href="https://github.com/mudler/LocalAI" target="_blank" rel="noopener">mudler/LocalAI</a></td><td>Serveur auto-hébergé compatible OpenAI : texte, image, audio, plusieurs backends.</td></tr><tr><td class="nm"><b>MLC LLM</b></td><td class="lk"><a href="https://github.com/mlc-ai/mlc-llm" target="_blank" rel="noopener">mlc-ai/mlc-llm</a></td><td>Compilation de modèles pour mobiles, navigateurs (WebGPU) et GPU variés.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 05 · Moteurs d&#x27;inférence et runtimes · 3/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Moteurs d&#x27;inférence et runtimes</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Lemonade</b></td><td class="lk"><a href="https://github.com/lemonade-sdk/lemonade" target="_blank" rel="noopener">lemonade-sdk/lemonade</a></td><td>Serveur local d&#x27;AMD pour GPU et NPU Ryzen AI.</td></tr><tr><td class="nm"><b>exo</b></td><td class="lk"><a href="https://github.com/exo-explore/exo" target="_blank" rel="noopener">exo-explore/exo</a></td><td>Répartit un gros modèle sur plusieurs appareils du quotidien (Mac, PC).</td></tr><tr><td class="nm"><b>BitNet</b></td><td class="lk"><a href="https://github.com/microsoft/BitNet" target="_blank" rel="noopener">microsoft/BitNet</a></td><td>Inférence de modèles à 1 bit sur CPU : à surveiller pour l&#x27;embarqué.</td></tr><tr><td class="nm"><b>TGI (maintenance)</b></td><td class="lk"><a href="https://github.com/huggingface/text-generation-inference" target="_blank" rel="noopener">huggingface/text-generation-inference</a></td><td>En mode maintenance depuis le 21 mars 2026 ; la documentation oriente vers vLLM, SGLang, llama.cpp et MLX.</td></tr><tr><td class="nm"><b>llm-d</b></td><td class="lk"><a href="https://github.com/llm-d/llm-d" target="_blank" rel="noopener">llm-d/llm-d</a></td><td>Orchestration Kubernetes de l&#x27;inférence distribuée avec vLLM.</td></tr><tr><td class="nm"><b>NVIDIA Dynamo</b></td><td class="lk"><a href="https://github.com/ai-dynamo/dynamo" target="_blank" rel="noopener">ai-dynamo/dynamo</a></td><td>Plateforme d&#x27;inférence distribuée à grande échelle.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Synthèse · choisir son moteur</div>
+  <h2 class="slide-title">Quel moteur pour quelle situation ?</h2>
+  <table class="cmp tools">
+    <tr><th>Situation</th><th>Choix recommandé</th><th>Pourquoi</th></tr>
+    <tr><td>Poste de formation, débutants</td><td><b>LM Studio</b> ou <b>Ollama</b></td><td>Installation en minutes, catalogue de modèles, API locale</td></tr>
+    <tr><td>Application qui appelle un modèle local</td><td><b>Ollama</b></td><td>Service en arrière-plan, API stable, scriptable</td></tr>
+    <tr><td>Mac Apple Silicon, vitesse maximale</td><td><b>MLX</b> (via LM Studio ou mlx-lm)</td><td>Souvent 20 à 25 % plus rapide que llama.cpp sur Mac selon les bancs d'essai</td></tr>
+    <tr><td>PC avec une GPU NVIDIA, usage personnel</td><td><b>llama.cpp</b> ou <b>ExLlamaV3</b></td><td>Contrôle fin, meilleure qualité par octet de VRAM</td></tr>
+    <tr><td>Serveur partagé, nombreux utilisateurs</td><td><b>vLLM</b> ou <b>SGLang</b></td><td>Batching continu : débit multiplié par plusieurs fois</td></tr>
+    <tr><td>Production 100 % NVIDIA à grande échelle</td><td><b>TensorRT-LLM</b> + Triton / Dynamo</td><td>Performance maximale, mise en œuvre lourde</td></tr>
+    <tr><td>CPU seul, embarqué, serveur sans GPU</td><td><b>llama.cpp</b></td><td>Large support matériel, quantification agressive</td></tr>
+    <tr><td>Démonstration sans installation</td><td><b>llamafile</b></td><td>Un seul fichier exécutable</td></tr>
+  </table>
+  <div class="src">Sources : comparatifs <a href="https://bizon-tech.com/blog/best-llm-inference-engines" target="_blank" rel="noopener">Bizon</a>, <a href="https://bestllmfor.com/guides/ollama-vs-lm-studio-vs-llama-cpp-2026/" target="_blank" rel="noopener">bestllmfor.com</a> et <a href="https://codersera.com/blog/ollama-vs-lm-studio-vs-vllm-vs-llama-cpp-vs-mlx-2026/" target="_blank" rel="noopener">Codersera</a> (2026).</div>
+  <div class="amorce">💬 Votre cas relève de quelle ligne ? Et dans six mois, quand vous aurez dix utilisateurs de plus ?</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">À retenir · Moteurs d&#x27;inférence et runtimes</div>
+  <h2 class="slide-title">Ce qu'il faut garder de la section 05</h2>
+  <ul class="points"><li><b>Même GGUF, même moteur</b> : sur NVIDIA, l'écart entre llama.cpp, Ollama et LM Studio reste faible (quelques pour cent). Le choix est un choix de confort.</li><li>Sur <b>Mac</b>, un backend MLX peut dépasser nettement llama.cpp. Sur serveur multi-utilisateurs, <b>vLLM ou SGLang</b> multiplient le débit.</li><li>Toutes ces options exposent une <b>API compatible OpenAI</b> : votre code client ne change pas, seule l'URL de base change.</li></ul>
+</section>
+<section class="slide slide-question">
+  <div class="q-tag">💬 Question de relance · section 05</div>
+  <div class="q-question">Votre équipe est de dix personnes, avec un serveur GPU : un poste par développeur sous Ollama, ou un vLLM partagé ?</div>
+</section>
+<section class="slide slide-divider">
+  <div class="section-num">06</div>
+  <div class="section-tag">Section 06</div>
+  <h1 class="section-title">Interfaces, passerelles et routeurs de modèles</h1>
+  <p class="section-sub">La couche entre vos applications et vos modèles, locaux ou cloud</p>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 06 · principe</div>
+  <h2 class="slide-title">Interfaces, passerelles et routeurs de modèles : de quoi parle-t-on ?</h2>
+  <div class="note" style="margin-top:0">Une passerelle unifie les fournisseurs derrière une seule API, applique quotas et journaux, et permet de basculer d&#x27;un modèle cloud à un modèle local.</div>
+  <div class="cnt">10 entrées dans cette section, présentées par tableaux de 7.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 06 · Interfaces, passerelles et routeurs de modèles · 1/2</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Interfaces, passerelles et routeurs de modèles</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Open WebUI</b></td><td class="lk"><a href="https://github.com/open-webui/open-webui" target="_blank" rel="noopener">open-webui/open-webui</a></td><td>Interface de chat auto-hébergée (Ollama et API OpenAI), RAG, utilisateurs, outils : le « ChatGPT interne » le plus répandu.</td></tr><tr><td class="nm"><b>LiteLLM</b></td><td class="lk"><a href="https://github.com/BerriAI/litellm" target="_blank" rel="noopener">BerriAI/litellm</a></td><td>Passerelle et SDK : 100+ fournisseurs derrière une API OpenAI, clés virtuelles, budgets.</td></tr><tr><td class="nm"><b>Jan</b></td><td class="lk"><a href="https://github.com/janhq/jan" target="_blank" rel="noopener">janhq/jan</a></td><td>Application de bureau open source pour modèles locaux, 100 % hors ligne.</td></tr><tr><td class="nm"><b>GPT4All</b></td><td class="lk"><a href="https://github.com/nomic-ai/gpt4all" target="_blank" rel="noopener">nomic-ai/gpt4all</a></td><td>Application locale simple, avec chat sur documents.</td></tr><tr><td class="nm"><b>AnythingLLM</b></td><td class="lk"><a href="https://github.com/Mintplex-Labs/anything-llm" target="_blank" rel="noopener">Mintplex-Labs/anything-llm</a></td><td>Application tout-en-un : chat, RAG sur documents, agents, bureau ou serveur.</td></tr><tr><td class="nm"><b>LibreChat</b></td><td class="lk"><a href="https://github.com/danny-avila/LibreChat" target="_blank" rel="noopener">danny-avila/LibreChat</a></td><td>Interface de chat multi-fournisseurs auto-hébergeable, bonne gestion des comptes.</td></tr><tr><td class="nm"><b>Cherry Studio</b></td><td class="lk"><a href="https://github.com/CherryHQ/cherry-studio" target="_blank" rel="noopener">CherryHQ/cherry-studio</a></td><td>Client de bureau multi-modèles avec bibliothèque d&#x27;assistants.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 06 · Interfaces, passerelles et routeurs de modèles · 2/2</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Interfaces, passerelles et routeurs de modèles</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>OpenRouter</b></td><td class="lk"><a href="https://openrouter.ai" target="_blank" rel="noopener">openrouter.ai</a></td><td>Service d&#x27;agrégation : un compte, des centaines de modèles. Pratique pour comparer avant d&#x27;héberger.</td></tr><tr><td class="nm"><b>Hugging Face Inference Providers</b></td><td class="lk"><a href="https://huggingface.co/docs/inference-providers" target="_blank" rel="noopener">documentation</a></td><td>Accès unifié à plusieurs hébergeurs depuis Hugging Face.</td></tr><tr><td class="nm"><b>TabbyAPI</b></td><td class="lk"><a href="https://github.com/theroyallab/tabbyAPI" target="_blank" rel="noopener">theroyallab/tabbyAPI</a></td><td>Serveur API compatible OpenAI pour ExLlama.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">À retenir · Interfaces, passerelles et routeurs de modèles</div>
+  <h2 class="slide-title">Ce qu'il faut garder de la section 06</h2>
+  <ul class="points"><li>Séparez toujours <b>l'application</b>, la <b>passerelle</b> et le <b>modèle</b> : vous changerez le troisième plus souvent que les deux autres.</li><li>Une passerelle est aussi l'endroit où mettre <b>quotas, journaux filtrés et clés</b> (rappel de la règle du Jour 1 : aucune clé côté navigateur).</li></ul>
+</section>
+<section class="slide slide-question">
+  <div class="q-tag">💬 Question de relance · section 06</div>
+  <div class="q-question">Qui, dans votre organisation, détient les clés d&#x27;API des modèles ? Combien de copies existent aujourd&#x27;hui ?</div>
+</section>
+<section class="slide slide-divider">
+  <div class="section-num">07</div>
+  <div class="section-tag">Section 07</div>
+  <h1 class="section-title">Hugging Face, GGUF et outils du Hub</h1>
+  <p class="section-sub">Le « GitHub de l&#x27;IA » : trouver, télécharger, convertir, évaluer</p>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 07 · principe</div>
+  <h2 class="slide-title">Hugging Face, GGUF et outils du Hub : de quoi parle-t-on ?</h2>
+  <div class="note" style="margin-top:0">Le Hub héberge modèles, jeux de données et démonstrations. Savoir filtrer, lire une fiche et télécharger proprement est une compétence de base.</div>
+  <div class="cnt">20 entrées dans cette section, présentées par tableaux de 7.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 07 · Hugging Face, GGUF et outils du Hub · 1/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Hugging Face, GGUF et outils du Hub</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Modèles GGUF (filtre)</b></td><td class="lk"><a href="https://huggingface.co/models?library=gguf" target="_blank" rel="noopener">huggingface.co/models?library=gguf</a></td><td>Point d&#x27;entrée de la démo du Jour 1 : uniquement les modèles utilisables avec llama.cpp, Ollama, LM Studio.</td></tr><tr><td class="nm"><b>Documentation GGUF</b></td><td class="lk"><a href="https://huggingface.co/docs/hub/gguf" target="_blank" rel="noopener">huggingface.co/docs/hub/gguf</a></td><td>Format, métadonnées, aperçu des tenseurs dans le navigateur.</td></tr><tr><td class="nm"><b>ggml-org (Hub)</b></td><td class="lk"><a href="https://huggingface.co/ggml-org" target="_blank" rel="noopener">hf.co/ggml-org</a></td><td>Organisation des mainteneurs de llama.cpp : GGUF officiels de référence.</td></tr><tr><td class="nm"><b>unsloth (Hub)</b></td><td class="lk"><a href="https://huggingface.co/unsloth" target="_blank" rel="noopener">hf.co/unsloth</a></td><td>GGUF « Dynamic » avec correctifs de modèles et gabarits de chat réparés ; publie perplexité et KL par quantification.</td></tr><tr><td class="nm"><b>bartowski (Hub)</b></td><td class="lk"><a href="https://huggingface.co/bartowski" target="_blank" rel="noopener">hf.co/bartowski</a></td><td>Quantificateur communautaire très suivi : gamme complète de quantifications avec imatrix.</td></tr><tr><td class="nm"><b>lmstudio-community (Hub)</b></td><td class="lk"><a href="https://huggingface.co/lmstudio-community" target="_blank" rel="noopener">hf.co/lmstudio-community</a></td><td>GGUF préparés pour LM Studio.</td></tr><tr><td class="nm"><b>mlx-community (Hub)</b></td><td class="lk"><a href="https://huggingface.co/mlx-community" target="_blank" rel="noopener">hf.co/mlx-community</a></td><td>Conversions MLX pour Apple Silicon.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 07 · Hugging Face, GGUF et outils du Hub · 2/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Hugging Face, GGUF et outils du Hub</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>transformers</b></td><td class="lk"><a href="https://github.com/huggingface/transformers" target="_blank" rel="noopener">huggingface/transformers</a></td><td>Bibliothèque de référence : charger, exécuter et entraîner des modèles (safetensors).</td></tr><tr><td class="nm"><b>huggingface_hub / hf CLI</b></td><td class="lk"><a href="https://github.com/huggingface/huggingface_hub" target="_blank" rel="noopener">huggingface/huggingface_hub</a></td><td>Téléchargement et publication : « hf download », reprise de transfert, cache partagé.</td></tr><tr><td class="nm"><b>safetensors</b></td><td class="lk"><a href="https://github.com/huggingface/safetensors" target="_blank" rel="noopener">huggingface/safetensors</a></td><td>Format de poids sûr (pas d&#x27;exécution de code) : préférez-le aux anciens fichiers pickle.</td></tr><tr><td class="nm"><b>datasets</b></td><td class="lk"><a href="https://github.com/huggingface/datasets" target="_blank" rel="noopener">huggingface/datasets</a></td><td>Chargement de jeux de données massifs, utile en fine-tuning et en évaluation.</td></tr><tr><td class="nm"><b>PEFT</b></td><td class="lk"><a href="https://github.com/huggingface/peft" target="_blank" rel="noopener">huggingface/peft</a></td><td>LoRA et variantes : ajuster un modèle sans le réentraîner entièrement.</td></tr><tr><td class="nm"><b>TRL</b></td><td class="lk"><a href="https://github.com/huggingface/trl" target="_blank" rel="noopener">huggingface/trl</a></td><td>Entraînement par renforcement et préférences (SFT, DPO, GRPO) : cadence de versions très soutenue.</td></tr><tr><td class="nm"><b>accelerate</b></td><td class="lk"><a href="https://github.com/huggingface/accelerate" target="_blank" rel="noopener">huggingface/accelerate</a></td><td>Entraînement distribué sans réécrire sa boucle.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 07 · Hugging Face, GGUF et outils du Hub · 3/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Hugging Face, GGUF et outils du Hub</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>optimum</b></td><td class="lk"><a href="https://github.com/huggingface/optimum" target="_blank" rel="noopener">huggingface/optimum</a></td><td>Export et optimisation (ONNX, accélérateurs).</td></tr><tr><td class="nm"><b>tokenizers</b></td><td class="lk"><a href="https://github.com/huggingface/tokenizers" target="_blank" rel="noopener">huggingface/tokenizers</a></td><td>Les tokeniseurs rapides : à manipuler pour comprendre la démo Tiktokenizer.</td></tr><tr><td class="nm"><b>gguf-my-repo</b></td><td class="lk"><a href="https://huggingface.co/spaces/ggml-org/gguf-my-repo" target="_blank" rel="noopener">Space ggml-org</a></td><td>Convertit et quantifie un modèle du Hub en GGUF depuis le navigateur.</td></tr><tr><td class="nm"><b>Spaces</b></td><td class="lk"><a href="https://huggingface.co/spaces" target="_blank" rel="noopener">huggingface.co/spaces</a></td><td>Démonstrations exécutables : un bon moyen de tester avant de télécharger.</td></tr><tr><td class="nm"><b>LMArena</b></td><td class="lk"><a href="https://lmarena.ai" target="_blank" rel="noopener">lmarena.ai</a></td><td>Classement par votes humains incluant des modèles ouverts. L&#x27;ancien Open LLM Leaderboard est archivé.</td></tr><tr><td class="nm"><b>lighteval</b></td><td class="lk"><a href="https://github.com/huggingface/lighteval" target="_blank" rel="noopener">huggingface/lighteval</a></td><td>Évaluation de modèles reproductible, outil du Hub.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">À retenir · Hugging Face, GGUF et outils du Hub</div>
+  <h2 class="slide-title">Ce qu'il faut garder de la section 07</h2>
+  <ul class="points"><li>Avant de télécharger : <b>licence</b>, <b>langue</b>, <b>taille</b>, <b>date</b>, <b>gabarit de chat</b>, <b>qui a quantifié</b>.</li><li>Vérifiez la publication <b>sur l'organisation officielle</b> : en 2026, des médias ont annoncé des poids qui n'existaient pas encore sur le Hub.</li><li>Un dépôt GGUF contient souvent <b>de nombreuses variantes</b> ; ne téléchargez qu'un fichier (Q4_K_M ou Q5_K_M pour commencer).</li></ul>
+</section>
+<section class="slide slide-question">
+  <div class="q-tag">💬 Question de relance · section 07</div>
+  <div class="q-question">Comment prouvez-vous à un client que le fichier de modèle que vous déployez est bien celui de l&#x27;éditeur ?</div>
+</section>
+<section class="slide slide-divider">
+  <div class="section-num">08</div>
+  <div class="section-tag">Section 08</div>
+  <h1 class="section-title">Modèles ouverts à connaître</h1>
+  <p class="section-sub">Familles à tester en local ou à héberger, état à vérifier avant chaque session</p>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 08 · principe</div>
+  <h2 class="slide-title">Modèles ouverts à connaître : de quoi parle-t-on ?</h2>
+  <div class="note" style="margin-top:0">Les classements changent chaque mois. Voici les familles à connaître et le rôle de chacune. Les chiffres et versions ci-dessous viennent de comparatifs publiés entre juin et octobre 2026 : confirmez sur la page du Hub.</div>
+  <div class="cnt">15 entrées dans cette section, présentées par tableaux de 7.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 08 · Modèles ouverts à connaître · 1/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Modèles ouverts à connaître</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Qwen (3.5 / 3.6)</b></td><td class="lk"><a href="https://huggingface.co/Qwen" target="_blank" rel="noopener">hf.co/Qwen</a></td><td>Échelle de tailles la plus large (licence Apache 2.0 sur la plupart), énorme écosystème de quantifications. Le meilleur point de départ pour une démo locale.</td></tr><tr><td class="nm"><b>gpt-oss (20b / 120b)</b></td><td class="lk"><a href="https://huggingface.co/openai" target="_blank" rel="noopener">hf.co/openai</a></td><td>Modèles à poids ouverts d&#x27;OpenAI : très bon rapport capacité/GPU, le 20b tient sur un portable de 16 Go.</td></tr><tr><td class="nm"><b>Gemma 4</b></td><td class="lk"><a href="https://huggingface.co/google" target="_blank" rel="noopener">hf.co/google</a></td><td>Famille de Google, variantes MoE (ex. 26B-A4B) très téléchargées ; bonne qualité multilingue.</td></tr><tr><td class="nm"><b>GLM-5.2</b></td><td class="lk"><a href="https://huggingface.co/zai-org" target="_blank" rel="noopener">hf.co/zai-org</a></td><td>Cité comme le meilleur modèle ouvert généraliste de 2026 pour le codage long (licence MIT, contexte 1M). Trop gros pour un portable.</td></tr><tr><td class="nm"><b>DeepSeek (V3.2 / V4 / R1)</b></td><td class="lk"><a href="https://huggingface.co/deepseek-ai" target="_blank" rel="noopener">hf.co/deepseek-ai</a></td><td>Référence rapport qualité/prix par API ; raisonnement avec R1 et ses distillations.</td></tr><tr><td class="nm"><b>Kimi (K2.x)</b></td><td class="lk"><a href="https://huggingface.co/moonshotai" target="_blank" rel="noopener">hf.co/moonshotai</a></td><td>Modèles agentiques et de code de Moonshot, très volumineux.</td></tr><tr><td class="nm"><b>MiniMax M3</b></td><td class="lk"><a href="https://huggingface.co/MiniMaxAI" target="_blank" rel="noopener">hf.co/MiniMaxAI</a></td><td>MoE multimodal (image et vidéo) avec contexte d&#x27;1 million de tokens, poids publiés sur le Hub.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 08 · Modèles ouverts à connaître · 2/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Modèles ouverts à connaître</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Mistral (Small 4 et autres)</b></td><td class="lk"><a href="https://huggingface.co/mistralai" target="_blank" rel="noopener">hf.co/mistralai</a></td><td>Éditeur français : bons résultats en français, tailles raisonnables.</td></tr><tr><td class="nm"><b>Llama</b></td><td class="lk"><a href="https://huggingface.co/meta-llama" target="_blank" rel="noopener">hf.co/meta-llama</a></td><td>Famille de Meta : écosystème énorme, licence à lire attentivement.</td></tr><tr><td class="nm"><b>Phi</b></td><td class="lk"><a href="https://huggingface.co/microsoft" target="_blank" rel="noopener">hf.co/microsoft</a></td><td>Petits modèles de Microsoft pour appareils modestes.</td></tr><tr><td class="nm"><b>SmolLM</b></td><td class="lk"><a href="https://huggingface.co/HuggingFaceTB" target="_blank" rel="noopener">hf.co/HuggingFaceTB</a></td><td>Très petits modèles et jeux de données ouverts, parfaits pour apprendre à entraîner.</td></tr><tr><td class="nm"><b>Granite</b></td><td class="lk"><a href="https://huggingface.co/ibm-granite" target="_blank" rel="noopener">hf.co/ibm-granite</a></td><td>Modèles d&#x27;IBM orientés entreprise, licence permissive.</td></tr><tr><td class="nm"><b>Nemotron</b></td><td class="lk"><a href="https://huggingface.co/nvidia" target="_blank" rel="noopener">hf.co/nvidia</a></td><td>Modèles et jeux de données de NVIDIA.</td></tr><tr><td class="nm"><b>Cohere (Command)</b></td><td class="lk"><a href="https://huggingface.co/CohereLabs" target="_blank" rel="noopener">hf.co/CohereLabs</a></td><td>Modèles multilingues orientés RAG, licences à vérifier pour l&#x27;usage commercial.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 08 · Modèles ouverts à connaître · 3/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Modèles ouverts à connaître</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>LFM (Liquid AI)</b></td><td class="lk"><a href="https://huggingface.co/LiquidAI" target="_blank" rel="noopener">hf.co/LiquidAI</a></td><td>Architectures hybrides très compactes pour appareils.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">À retenir · Modèles ouverts à connaître</div>
+  <h2 class="slide-title">Ce qu'il faut garder de la section 08</h2>
+  <ul class="points"><li><b>Poids ouverts ≠ open source</b> : lisez la licence (usage commercial, seuils d'utilisateurs, restrictions géographiques).</li><li>Un modèle <b>MoE</b> (mixture d'experts) consomme la mémoire de tous ses paramètres mais calcule seulement avec les actifs : « 35B-A3B » = rapide, mais 35B à charger.</li><li>Pour le français et l'Afrique francophone : testez toujours <b>sur vos propres textes</b>, les benchmarks sont surtout anglophones.</li></ul>
+</section>
+<section class="slide slide-question">
+  <div class="q-tag">💬 Question de relance · section 08</div>
+  <div class="q-question">Si vous deviez choisir un seul modèle pour une démonstration hors ligne devant des stagiaires, lequel, et sur quels critères ?</div>
+</section>
+<section class="slide slide-divider">
+  <div class="section-num">09</div>
+  <div class="section-tag">Section 09</div>
+  <h1 class="section-title">Formats et quantification</h1>
+  <p class="section-sub">GGUF, safetensors, MLX, AWQ, GPTQ, EXL3 : savoir lequel va avec quel moteur</p>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 09 · principe</div>
+  <h2 class="slide-title">Formats et quantification : de quoi parle-t-on ?</h2>
+  <div class="note" style="margin-top:0">Le format dépend du moteur. Un GGUF ne se charge pas dans vLLM comme un modèle natif ; des poids AWQ ne se chargent pas dans Ollama.</div>
+  <div class="cnt">10 entrées dans cette section, présentées par tableaux de 7.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 09 · Formats et quantification · 1/2</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Formats et quantification</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>GGUF</b></td><td class="lk"><a href="https://huggingface.co/docs/hub/gguf" target="_blank" rel="noopener">documentation</a></td><td>Fichier unique poids + métadonnées + tokeniseur. Pour llama.cpp, Ollama, LM Studio, Jan, KoboldCpp.</td></tr><tr><td class="nm"><b>convert_hf_to_gguf.py</b></td><td class="lk"><a href="https://github.com/ggml-org/llama.cpp" target="_blank" rel="noopener">ggml-org/llama.cpp</a></td><td>Script du dépôt llama.cpp qui convertit des poids Hugging Face en GGUF F16/BF16.</td></tr><tr><td class="nm"><b>llama-quantize</b></td><td class="lk"><a href="https://github.com/ggml-org/llama.cpp" target="_blank" rel="noopener">ggml-org/llama.cpp</a></td><td>Outil du dépôt qui produit Q8_0, Q6_K, Q5_K_M, Q4_K_M, IQ4_XS… à partir d&#x27;un GGUF.</td></tr><tr><td class="nm"><b>imatrix</b></td><td class="lk"><a href="https://github.com/ggml-org/llama.cpp" target="_blank" rel="noopener">ggml-org/llama.cpp</a></td><td>Matrice d&#x27;importance calculée sur un texte d&#x27;étalonnage : améliore surtout les petits bits (3 et 2 bits).</td></tr><tr><td class="nm"><b>Unsloth Dynamic GGUF</b></td><td class="lk"><a href="https://unsloth.ai/docs/basics/unsloth-dynamic-2.0-ggufs" target="_blank" rel="noopener">documentation Unsloth</a></td><td>Quantification par couche (sensibilité) : même taille, meilleure fidélité ; version 3.0 annoncée avec étalonnage orienté code agentique.</td></tr><tr><td class="nm"><b>AWQ / llm-compressor</b></td><td class="lk"><a href="https://github.com/vllm-project/llm-compressor" target="_blank" rel="noopener">vllm-project/llm-compressor</a></td><td>Quantification de poids pour vLLM (AWQ, GPTQ, FP8).</td></tr><tr><td class="nm"><b>GPTQModel</b></td><td class="lk"><a href="https://github.com/ModelCloud/GPTQModel" target="_blank" rel="noopener">ModelCloud/GPTQModel</a></td><td>Quantification GPTQ maintenue, intégrée à transformers.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 09 · Formats et quantification · 2/2</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Formats et quantification</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>bitsandbytes</b></td><td class="lk"><a href="https://github.com/bitsandbytes-foundation/bitsandbytes" target="_blank" rel="noopener">bitsandbytes-foundation/bitsandbytes</a></td><td>Quantification 8 et 4 bits à la volée, base de QLoRA.</td></tr><tr><td class="nm"><b>MLX (format)</b></td><td class="lk"><a href="https://github.com/ml-explore/mlx-lm" target="_blank" rel="noopener">ml-explore/mlx-lm</a></td><td>Poids convertis pour Apple Silicon (« mlx_lm.convert »).</td></tr><tr><td class="nm"><b>EXL3</b></td><td class="lk"><a href="https://github.com/turboderp-org/exllamav3" target="_blank" rel="noopener">turboderp-org/exllamav3</a></td><td>Format du moteur ExLlamaV3 pour GPU NVIDIA.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Synthèse · compatibilité</div>
+  <h2 class="slide-title">Quel format dans quel moteur ?</h2>
+  <table class="cmp tools">
+    <tr><th>Format</th><th>Se charge dans</th><th>Typiquement trouvé chez</th></tr>
+    <tr><td><b>GGUF</b></td><td>llama.cpp, Ollama, LM Studio, Jan, KoboldCpp ; vLLM en mode expérimental</td><td>unsloth, bartowski, ggml-org, lmstudio-community</td></tr>
+    <tr><td><b>safetensors (FP16/BF16/FP8)</b></td><td>transformers, vLLM, SGLang ; MLX après conversion</td><td>Organisations officielles de l'éditeur</td></tr>
+    <tr><td><b>AWQ / GPTQ</b></td><td>vLLM, SGLang (à vérifier selon le moteur)</td><td>Éditeurs et communautés</td></tr>
+    <tr><td><b>MLX</b></td><td>mlx-lm, LM Studio sur Mac</td><td>mlx-community</td></tr>
+    <tr><td><b>EXL3</b></td><td>ExLlamaV3 / TabbyAPI</td><td>Communauté</td></tr>
+  </table>
+  <div class="src">Source : <a href="https://bestllmfor.com/guide/comparer-backends-inference/" target="_blank" rel="noopener">bestllmfor.com — comparer les backends</a>.</div>
+  <div class="note">Règle simple : <b>le format est dicté par le moteur</b>, jamais l'inverse. Choisissez le moteur d'abord, puis cherchez le fichier correspondant.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Synthèse · quantification</div>
+  <h2 class="slide-title">Lire les suffixes : Q8_0, Q6_K, Q5_K_M, Q4_K_M, IQ4_XS…</h2>
+  <table class="cmp tools">
+    <tr><th>Variante</th><th>Bits / poids (ordre de grandeur)</th><th>Qualité</th><th>Quand l'utiliser</th></tr>
+    <tr><td>F16 / BF16</td><td>16</td><td>référence</td><td>Conversion, fine-tuning, serveur GPU</td></tr>
+    <tr><td>Q8_0</td><td>~8,5</td><td>quasi identique</td><td>Poste puissant, si la mémoire le permet</td></tr>
+    <tr><td>Q6_K</td><td>~6,6</td><td>excellente</td><td>Bon compromis haut de gamme</td></tr>
+    <tr><td>Q5_K_M</td><td>~5,7</td><td>très bonne</td><td>Remplace Q8 quand la mémoire manque</td></tr>
+    <tr><td><b>Q4_K_M</b></td><td><b>~4,9</b></td><td><b>bonne</b></td><td><b>Défaut raisonnable pour la plupart des cas</b></td></tr>
+    <tr><td>IQ4_XS</td><td>~4,3</td><td>bonne</td><td>Un peu plus petit que Q4_K_M, un peu plus lent</td></tr>
+    <tr><td>Q3_K_M / IQ3</td><td>~3,5 à 3,9</td><td>correcte</td><td>Gros modèle sur machine juste</td></tr>
+    <tr><td>Q2_K / IQ2</td><td>~2,5 à 3,4</td><td>dégradée</td><td>Dernier recours ; préférez un modèle plus petit en Q4</td></tr>
+    <tr><td>UD-Q4_K_XL (Unsloth)</td><td>variable par couche</td><td>meilleure à taille égale</td><td>À essayer à la place de Q4_K_M</td></tr>
+  </table>
+  <div class="note"><b>Règle d'or</b> : un modèle plus petit en Q5/Q6 bat très souvent un modèle plus grand en Q2. Les valeurs de bits sont approximatives et varient selon l'architecture.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Synthèse · dimensionner</div>
+  <h2 class="slide-title">Combien de mémoire pour quel modèle ?</h2>
+  <ul class="points">
+    <li>Formule de départ : <b>taille du fichier ≈ paramètres (en milliards) × bits ÷ 8</b>. Exemple : 8 × 4,9 ÷ 8 ≈ 4,9 Go.</li>
+    <li>Ajoutez le <b>cache de contexte (KV cache)</b> : de 1 à plusieurs Go selon la longueur, qui peut être le facteur limitant sur de longs contextes.</li>
+    <li>Prévoyez <b>20 à 30 % de marge</b> pour le système et les autres applications.</li>
+  </ul>
+  <table class="cmp tools">
+    <tr><th>Taille du modèle</th><th>Fichier en Q4_K_M (ordre de grandeur)</th><th>Machine raisonnable</th></tr>
+    <tr><td>3 à 4 milliards</td><td>~2 à 2,5 Go</td><td>Portable 8 Go</td></tr>
+    <tr><td>7 à 9 milliards</td><td>~4,5 à 5,5 Go</td><td>Portable 16 Go</td></tr>
+    <tr><td>14 milliards</td><td>~9 Go</td><td>16 à 32 Go de RAM ou GPU 12 Go</td></tr>
+    <tr><td>30 à 35 milliards</td><td>~19 à 21 Go</td><td>32 à 48 Go ou GPU 24 Go</td></tr>
+    <tr><td>70 milliards</td><td>~42 Go</td><td>64 Go de mémoire unifiée ou 2 GPU</td></tr>
+  </table>
+  <div class="note">Pour un modèle <b>MoE</b> (ex. 35B-A3B) : la mémoire suit les 35 milliards totaux, la vitesse suit les 3 milliards actifs.</div>
+</section>
+<section class="slide slide-code">
+  <div class="code-tag">Code · aide-mémoire</div>
+  <h2 class="slide-title code-title">Les commandes qui reviennent tout le temps</h2>
+  <div class="file-path">terminal — chaque bloc est indépendant</div>
+<pre class="code"><span class="cm"># Ollama : télécharger et discuter</span>
+ollama run gpt-oss:20b
+
+<span class="cm"># llama.cpp : serveur compatible OpenAI, modèle tiré directement de Hugging Face</span>
+llama-server -hf ggml-org/gpt-oss-20b-GGUF --port 8080
+
+<span class="cm"># Télécharger un seul fichier GGUF (jamais tout le dépôt)</span>
+hf download bartowski/Llama-3.3-70B-Instruct-GGUF Llama-3.3-70B-Instruct-Q4_K_M.gguf --local-dir ./models
+
+<span class="cm"># Convertir puis quantifier soi-même</span>
+python convert_hf_to_gguf.py ./mon-modele --outfile mon-modele-f16.gguf
+llama-quantize mon-modele-f16.gguf mon-modele-Q4_K_M.gguf Q4_K_M
+
+<span class="cm"># vLLM : serveur multi-utilisateurs sur GPU</span>
+vllm serve Qwen/Qwen3-8B
+
+<span class="cm"># MLX sur Mac</span>
+mlx_lm.server --model mlx-community/Qwen3-8B-4bit</pre>
+  <div class="note">URL de base à mettre dans votre code client : Ollama <code class="inline">http://localhost:11434/v1</code> · LM Studio <code class="inline">:1234/v1</code> · llama-server <code class="inline">:8080/v1</code> · vLLM <code class="inline">:8000/v1</code>. Le reste du code ne change pas.</div>
+  <div class="amorce">💬 Quelle ligne de ce bloc changeriez-vous si le modèle ne devait jamais quitter le réseau de l'entreprise ?</div>
+</section>
+<section class="slide slide-question">
+  <div class="q-tag">💬 Question de relance · section 09</div>
+  <div class="q-question">Quel est le premier fichier à vérifier quand un modèle « répond bizarrement » : les poids, ou le gabarit de chat embarqué ?</div>
+</section>
+<section class="slide slide-divider">
+  <div class="section-num">10</div>
+  <div class="section-tag">Section 10</div>
+  <h1 class="section-title">RAG, embeddings, bases vectorielles et mémoire</h1>
+  <p class="section-sub">Le chaînon du Jour 3 : de vos documents à un assistant qui cite ses sources</p>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 10 · principe</div>
+  <h2 class="slide-title">RAG, embeddings, bases vectorielles et mémoire : de quoi parle-t-on ?</h2>
+  <div class="note" style="margin-top:0">Un RAG = découper, vectoriser, stocker, retrouver, puis faire répondre le modèle avec les extraits. La qualité se joue surtout dans le parsing et la recherche, pas dans le modèle.</div>
+  <div class="cnt">25 entrées dans cette section, présentées par tableaux de 7.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 10 · RAG, embeddings, bases vectorielles et mémoire · 1/4</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">RAG, embeddings, bases vectorielles et mémoire</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Chroma</b></td><td class="lk"><a href="https://github.com/chroma-core/chroma" target="_blank" rel="noopener">chroma-core/chroma</a></td><td>Base vectorielle locale la plus simple : idéale pour la démo (voir slide Jour 1).</td></tr><tr><td class="nm"><b>Qdrant</b></td><td class="lk"><a href="https://github.com/qdrant/qdrant" target="_blank" rel="noopener">qdrant/qdrant</a></td><td>Base vectorielle en Rust, excellente en filtrage par métadonnées ; défaut auto-hébergé de nombreuses équipes.</td></tr><tr><td class="nm"><b>pgvector</b></td><td class="lk"><a href="https://github.com/pgvector/pgvector" target="_blank" rel="noopener">pgvector/pgvector</a></td><td>Extension PostgreSQL : suffisante jusqu&#x27;à environ 10 millions de vecteurs si vous avez déjà Postgres.</td></tr><tr><td class="nm"><b>pgvectorscale</b></td><td class="lk"><a href="https://github.com/timescale/pgvectorscale" target="_blank" rel="noopener">timescale/pgvectorscale</a></td><td>Étend pgvector avec DiskANN pour dépasser 10 millions de vecteurs sur Postgres.</td></tr><tr><td class="nm"><b>FAISS</b></td><td class="lk"><a href="https://github.com/facebookresearch/faiss" target="_blank" rel="noopener">facebookresearch/faiss</a></td><td>Bibliothèque de recherche de voisins (pas une base) : pour comprendre les index.</td></tr><tr><td class="nm"><b>Milvus</b></td><td class="lk"><a href="https://github.com/milvus-io/milvus" target="_blank" rel="noopener">milvus-io/milvus</a></td><td>Pour des centaines de millions à des milliards de vecteurs, déploiement distribué.</td></tr><tr><td class="nm"><b>LanceDB</b></td><td class="lk"><a href="https://github.com/lancedb/lancedb" target="_blank" rel="noopener">lancedb/lancedb</a></td><td>Base embarquée sur format colonne Lance : multimodal, s&#x27;exécute sans serveur.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 10 · RAG, embeddings, bases vectorielles et mémoire · 2/4</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">RAG, embeddings, bases vectorielles et mémoire</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Weaviate</b></td><td class="lk"><a href="https://github.com/weaviate/weaviate" target="_blank" rel="noopener">weaviate/weaviate</a></td><td>Recherche hybride native (mots + vecteurs), modèle objet.</td></tr><tr><td class="nm"><b>sentence-transformers</b></td><td class="lk"><a href="https://github.com/UKPLab/sentence-transformers" target="_blank" rel="noopener">UKPLab/sentence-transformers</a></td><td>Bibliothèque Python d&#x27;embeddings : pour fabriquer ses vecteurs sans API.</td></tr><tr><td class="nm"><b>MTEB</b></td><td class="lk"><a href="https://github.com/embeddings-benchmark/mteb" target="_blank" rel="noopener">embeddings-benchmark/mteb</a></td><td>Banc d&#x27;essai de référence des modèles d&#x27;embeddings, avec classement multilingue.</td></tr><tr><td class="nm"><b>BGE-M3</b></td><td class="lk"><a href="https://huggingface.co/BAAI/bge-m3" target="_blank" rel="noopener">hf.co/BAAI/bge-m3</a></td><td>Embeddings multilingues (dense, creux, multi-vecteurs), bon en français.</td></tr><tr><td class="nm"><b>Qwen3-Embedding</b></td><td class="lk"><a href="https://huggingface.co/Qwen/Qwen3-Embedding-0.6B" target="_blank" rel="noopener">hf.co/Qwen/Qwen3-Embedding-0.6B</a></td><td>Embeddings multilingues compacts, plusieurs tailles.</td></tr><tr><td class="nm"><b>EmbeddingGemma</b></td><td class="lk"><a href="https://huggingface.co/google/embeddinggemma-300m" target="_blank" rel="noopener">hf.co/google/embeddinggemma-300m</a></td><td>Petit modèle d&#x27;embeddings (300M) qui tourne sur appareil.</td></tr><tr><td class="nm"><b>Nomic Embed</b></td><td class="lk"><a href="https://huggingface.co/nomic-ai/nomic-embed-text-v1.5" target="_blank" rel="noopener">hf.co/nomic-ai/nomic-embed-text-v1.5</a></td><td>Embeddings ouverts, disponibles dans Ollama et LM Studio.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 10 · RAG, embeddings, bases vectorielles et mémoire · 3/4</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">RAG, embeddings, bases vectorielles et mémoire</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Docling</b></td><td class="lk"><a href="https://github.com/docling-project/docling" target="_blank" rel="noopener">docling-project/docling</a></td><td>Convertit PDF, Office et images en texte structuré (tableaux, mise en page) pour le RAG.</td></tr><tr><td class="nm"><b>MarkItDown</b></td><td class="lk"><a href="https://github.com/microsoft/markitdown" target="_blank" rel="noopener">microsoft/markitdown</a></td><td>Convertit tout document en Markdown pour LLM, très léger.</td></tr><tr><td class="nm"><b>Unstructured</b></td><td class="lk"><a href="https://github.com/Unstructured-IO/unstructured" target="_blank" rel="noopener">Unstructured-IO/unstructured</a></td><td>Découpage et extraction de documents hétérogènes.</td></tr><tr><td class="nm"><b>MinerU</b></td><td class="lk"><a href="https://github.com/opendatalab/MinerU" target="_blank" rel="noopener">opendatalab/MinerU</a></td><td>Extraction de PDF complexes (formules, tableaux), utile pour le scientifique.</td></tr><tr><td class="nm"><b>RAGFlow</b></td><td class="lk"><a href="https://github.com/infiniflow/ragflow" target="_blank" rel="noopener">infiniflow/ragflow</a></td><td>Moteur RAG complet avec compréhension de documents et recherche multi-rappel.</td></tr><tr><td class="nm"><b>LightRAG</b></td><td class="lk"><a href="https://github.com/HKUDS/LightRAG" target="_blank" rel="noopener">HKUDS/LightRAG</a></td><td>RAG à graphe de connaissances, plus léger que GraphRAG.</td></tr><tr><td class="nm"><b>GraphRAG</b></td><td class="lk"><a href="https://github.com/microsoft/graphrag" target="_blank" rel="noopener">microsoft/graphrag</a></td><td>Résumés communautaires sur graphe : pour les questions globales sur un corpus.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 10 · RAG, embeddings, bases vectorielles et mémoire · 4/4</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">RAG, embeddings, bases vectorielles et mémoire</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Graphiti</b></td><td class="lk"><a href="https://github.com/getzep/graphiti" target="_blank" rel="noopener">getzep/graphiti</a></td><td>Graphe de connaissances temporel pour la mémoire d&#x27;agents.</td></tr><tr><td class="nm"><b>mem0</b></td><td class="lk"><a href="https://github.com/mem0ai/mem0" target="_blank" rel="noopener">mem0ai/mem0</a></td><td>Couche de mémoire persistante pour agents et assistants.</td></tr><tr><td class="nm"><b>Letta</b></td><td class="lk"><a href="https://github.com/letta-ai/letta" target="_blank" rel="noopener">letta-ai/letta</a></td><td>Agents à mémoire gérée (ex-MemGPT) avec serveur.</td></tr><tr><td class="nm"><b>Firecrawl</b></td><td class="lk"><a href="https://github.com/firecrawl/firecrawl" target="_blank" rel="noopener">firecrawl/firecrawl</a></td><td>Transforme un site web en données propres pour le RAG.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">À retenir · RAG, embeddings, bases vectorielles et mémoire</div>
+  <h2 class="slide-title">Ce qu'il faut garder de la section 10</h2>
+  <ul class="points"><li>Chaîne minimale fiable : <b>parsing propre → découpage avec métadonnées → recherche hybride → reranking → réponse avec citation</b>.</li><li>Mesurez la <b>recherche</b> (les bons extraits remontent-ils ?) avant de mesurer la réponse. Sans cela, on règle le mauvais composant.</li><li>Pour quelques milliers de documents, une liste Python suffit (rappel du Jour 1) : n'ajoutez pas une base avant d'en avoir besoin.</li></ul>
+</section>
+<section class="slide slide-question">
+  <div class="q-tag">💬 Question de relance · section 10</div>
+  <div class="q-question">Quel type de document de votre organisation ferait échouer un parseur de PDF : tableau, scan, schéma, texte en colonnes ?</div>
+</section>
+<section class="slide slide-divider">
+  <div class="section-num">11</div>
+  <div class="section-tag">Section 11</div>
+  <h1 class="section-title">Fine-tuning et entraînement</h1>
+  <p class="section-sub">Adapter un modèle : LoRA, QLoRA, DPO, GRPO</p>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 11 · principe</div>
+  <h2 class="slide-title">Fine-tuning et entraînement : de quoi parle-t-on ?</h2>
+  <div class="note" style="margin-top:0">Avant de fine-tuner, essayez le prompt, puis le RAG. Le fine-tuning sert à fixer un style, un format ou une compétence étroite, pas à ajouter des connaissances changeantes.</div>
+  <div class="cnt">12 entrées dans cette section, présentées par tableaux de 7.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 11 · Fine-tuning et entraînement · 1/2</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Fine-tuning et entraînement</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Unsloth</b></td><td class="lk"><a href="https://github.com/unslothai/unsloth" target="_blank" rel="noopener">unslothai/unsloth</a></td><td>Entraînement 2 à 5 fois plus rapide avec beaucoup moins de VRAM sur une seule GPU ; exporte directement en GGUF ; app Unsloth Studio. Multi-GPU limité à l&#x27;offre payante.</td></tr><tr><td class="nm"><b>LLaMA-Factory</b></td><td class="lk"><a href="https://github.com/hiyouga/LLaMA-Factory" target="_blank" rel="noopener">hiyouga/LLaMA-Factory</a></td><td>Interface web et large couverture de modèles et méthodes (SFT, DPO, KTO, ORPO). Le plus simple pour un premier essai.</td></tr><tr><td class="nm"><b>Axolotl</b></td><td class="lk"><a href="https://github.com/axolotl-ai-cloud/axolotl" target="_blank" rel="noopener">axolotl-ai-cloud/axolotl</a></td><td>Pipelines pilotés par fichier de configuration, FSDP2 et DeepSpeed : le choix de production multi-GPU.</td></tr><tr><td class="nm"><b>TRL</b></td><td class="lk"><a href="https://github.com/huggingface/trl" target="_blank" rel="noopener">huggingface/trl</a></td><td>Bibliothèque de base pour SFT, DPO, GRPO ; les autres outils s&#x27;appuient sur elle.</td></tr><tr><td class="nm"><b>PEFT</b></td><td class="lk"><a href="https://github.com/huggingface/peft" target="_blank" rel="noopener">huggingface/peft</a></td><td>LoRA, QLoRA, adaptateurs.</td></tr><tr><td class="nm"><b>torchtune (arrêté)</b></td><td class="lk"><a href="https://github.com/pytorch/torchtune" target="_blank" rel="noopener">pytorch/torchtune</a></td><td>Projet clôturé en juillet 2025 : à ne pas adopter pour un nouveau projet.</td></tr><tr><td class="nm"><b>verl</b></td><td class="lk"><a href="https://github.com/volcengine/verl" target="_blank" rel="noopener">volcengine/verl</a></td><td>Apprentissage par renforcement à grande échelle pour LLM.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 11 · Fine-tuning et entraînement · 2/2</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Fine-tuning et entraînement</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>OpenRLHF</b></td><td class="lk"><a href="https://github.com/OpenRLHF/OpenRLHF" target="_blank" rel="noopener">OpenRLHF/OpenRLHF</a></td><td>Framework RLHF distribué basé sur Ray et vLLM.</td></tr><tr><td class="nm"><b>DeepSpeed</b></td><td class="lk"><a href="https://github.com/deepspeedai/DeepSpeed" target="_blank" rel="noopener">deepspeedai/DeepSpeed</a></td><td>Optimisations d&#x27;entraînement distribué (ZeRO).</td></tr><tr><td class="nm"><b>nanoGPT</b></td><td class="lk"><a href="https://github.com/karpathy/nanoGPT" target="_blank" rel="noopener">karpathy/nanoGPT</a></td><td>Un GPT complet en quelques centaines de lignes : le meilleur support pour expliquer l&#x27;attention.</td></tr><tr><td class="nm"><b>nanochat</b></td><td class="lk"><a href="https://github.com/karpathy/nanochat" target="_blank" rel="noopener">karpathy/nanochat</a></td><td>Pipeline complet d&#x27;un petit « ChatGPT » depuis zéro.</td></tr><tr><td class="nm"><b>llm.c</b></td><td class="lk"><a href="https://github.com/karpathy/llm.c" target="_blank" rel="noopener">karpathy/llm.c</a></td><td>Entraînement d&#x27;un GPT en C pur : démystifie ce qu&#x27;est un modèle.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">À retenir · Fine-tuning et entraînement</div>
+  <h2 class="slide-title">Ce qu'il faut garder de la section 11</h2>
+  <ul class="points"><li>Ordre de décision : <b>prompt → exemples → RAG → fine-tuning</b>. Chaque étape coûte dix fois la précédente.</li><li>Un fine-tuning réussi dépend à 80 % du <b>jeu de données</b> : 500 exemples propres valent mieux que 50 000 sales.</li><li>Exportez vers <b>GGUF</b> pour le déployer dans Ollama ou LM Studio, et refaites vos évaluations après quantification.</li></ul>
+</section>
+<section class="slide slide-question">
+  <div class="q-tag">💬 Question de relance · section 11</div>
+  <div class="q-question">Quelle tâche de votre métier est assez étroite et assez stable pour justifier un fine-tuning plutôt qu&#x27;un bon prompt ?</div>
+</section>
+<section class="slide slide-divider">
+  <div class="section-num">12</div>
+  <div class="section-tag">Section 12</div>
+  <h1 class="section-title">Évaluation, observabilité et sécurité</h1>
+  <p class="section-sub">Ce qui sépare une démonstration d&#x27;un produit : mesurer, tracer, protéger</p>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 12 · principe</div>
+  <h2 class="slide-title">Évaluation, observabilité et sécurité : de quoi parle-t-on ?</h2>
+  <div class="note" style="margin-top:0">Sans évaluation, « c&#x27;est mieux » n&#x27;est pas une mesure (voir la grille sur 7 du Jour 1). Sans traces, impossible de comprendre pourquoi un agent a échoué.</div>
+  <div class="cnt">18 entrées dans cette section, présentées par tableaux de 7.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 12 · Évaluation, observabilité et sécurité · 1/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Évaluation, observabilité et sécurité</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Langfuse</b></td><td class="lk"><a href="https://github.com/langfuse/langfuse" target="_blank" rel="noopener">langfuse/langfuse</a></td><td>Observabilité, évaluations, gestion de prompts, auto-hébergeable, cœur MIT : la plateforme open source la plus adoptée.</td></tr><tr><td class="nm"><b>Promptfoo</b></td><td class="lk"><a href="https://github.com/promptfoo/promptfoo" target="_blank" rel="noopener">promptfoo/promptfoo</a></td><td>Tests de prompts en YAML/CLI intégrables à la CI, et red teaming. Le « Jest » des prompts.</td></tr><tr><td class="nm"><b>DeepEval</b></td><td class="lk"><a href="https://github.com/confident-ai/deepeval" target="_blank" rel="noopener">confident-ai/deepeval</a></td><td>Évaluations façon pytest pour LLM, métriques RAG et agents (Apache 2.0).</td></tr><tr><td class="nm"><b>Arize Phoenix</b></td><td class="lk"><a href="https://github.com/Arize-ai/phoenix" target="_blank" rel="noopener">Arize-ai/phoenix</a></td><td>Traces et évaluations basées sur OpenTelemetry. Attention : licence Elastic 2.0, source disponible mais pas open source au sens OSI.</td></tr><tr><td class="nm"><b>Opik</b></td><td class="lk"><a href="https://github.com/comet-ml/opik" target="_blank" rel="noopener">comet-ml/opik</a></td><td>Plateforme d&#x27;évaluation et de suivi de Comet, open source.</td></tr><tr><td class="nm"><b>MLflow</b></td><td class="lk"><a href="https://github.com/mlflow/mlflow" target="_blank" rel="noopener">mlflow/mlflow</a></td><td>Plateforme complète déjà connue des équipes data : suivi, évaluation, traces (Apache 2.0).</td></tr><tr><td class="nm"><b>Ragas</b></td><td class="lk"><a href="https://github.com/explodinggradients/ragas" target="_blank" rel="noopener">explodinggradients/ragas</a></td><td>Métriques RAG et données synthétiques. Un comparatif d&#x27;août 2026 signale des commits arrêtés et un changement d&#x27;organisation GitHub : vérifier.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 12 · Évaluation, observabilité et sécurité · 2/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Évaluation, observabilité et sécurité</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Inspect AI</b></td><td class="lk"><a href="https://github.com/UKGovernmentBEIS/inspect_ai" target="_blank" rel="noopener">UKGovernmentBEIS/inspect_ai</a></td><td>Cadre d&#x27;évaluation rigoureux de l&#x27;AI Security Institute britannique.</td></tr><tr><td class="nm"><b>lm-evaluation-harness</b></td><td class="lk"><a href="https://github.com/EleutherAI/lm-evaluation-harness" target="_blank" rel="noopener">EleutherAI/lm-evaluation-harness</a></td><td>Banc d&#x27;essai standard des modèles sur des centaines de tâches.</td></tr><tr><td class="nm"><b>OpenLLMetry</b></td><td class="lk"><a href="https://github.com/traceloop/openllmetry" target="_blank" rel="noopener">traceloop/openllmetry</a></td><td>Instrumentation OpenTelemetry des appels LLM.</td></tr><tr><td class="nm"><b>Guardrails AI</b></td><td class="lk"><a href="https://github.com/guardrails-ai/guardrails" target="_blank" rel="noopener">guardrails-ai/guardrails</a></td><td>Validation structurée et garde-fous sur les sorties.</td></tr><tr><td class="nm"><b>NeMo Guardrails</b></td><td class="lk"><a href="https://github.com/NVIDIA/NeMo-Guardrails" target="_blank" rel="noopener">NVIDIA/NeMo-Guardrails</a></td><td>Rails programmables de conversation (sujets, jailbreak).</td></tr><tr><td class="nm"><b>LLM Guard</b></td><td class="lk"><a href="https://github.com/protectai/llm-guard" target="_blank" rel="noopener">protectai/llm-guard</a></td><td>Filtres d&#x27;entrée/sortie : injection, données sensibles.</td></tr><tr><td class="nm"><b>Presidio</b></td><td class="lk"><a href="https://github.com/microsoft/presidio" target="_blank" rel="noopener">microsoft/presidio</a></td><td>Détection et anonymisation de données personnelles avant envoi à un modèle : très utile pour le RGPD.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 12 · Évaluation, observabilité et sécurité · 3/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Évaluation, observabilité et sécurité</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>garak</b></td><td class="lk"><a href="https://github.com/NVIDIA/garak" target="_blank" rel="noopener">NVIDIA/garak</a></td><td>Scanner de vulnérabilités de LLM (injections, fuites).</td></tr><tr><td class="nm"><b>PyRIT</b></td><td class="lk"><a href="https://github.com/Azure/PyRIT" target="_blank" rel="noopener">Azure/PyRIT</a></td><td>Framework de red teaming de systèmes d&#x27;IA générative.</td></tr><tr><td class="nm"><b>Giskard</b></td><td class="lk"><a href="https://github.com/Giskard-AI/giskard" target="_blank" rel="noopener">Giskard-AI/giskard</a></td><td>Tests de qualité et de sécurité pour LLM et modèles classiques.</td></tr><tr><td class="nm"><b>OWASP Top 10 LLM</b></td><td class="lk"><a href="https://github.com/OWASP/www-project-top-10-for-large-language-model-applications" target="_blank" rel="noopener">OWASP/www-project-top-10-for-large-language-model-applications</a></td><td>Les dix risques d&#x27;applications LLM : injection de prompt, divulgation, chaîne d&#x27;approvisionnement…</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">À retenir · Évaluation, observabilité et sécurité</div>
+  <h2 class="slide-title">Ce qu'il faut garder de la section 12</h2>
+  <ul class="points"><li>Mesurez en trois couches : <b>tests unitaires de prompts</b> (CI), <b>évaluations sur jeu de données</b>, <b>traces en production</b>.</li><li>Pour le RGPD : <b>anonymiser avant d'envoyer</b> (Presidio), journaliser le minimum, documenter où partent les données.</li><li>Le Règlement européen sur l'IA impose l'explicabilité pour certains usages à haut risque : conservez les traces.</li></ul>
+</section>
+<section class="slide slide-question">
+  <div class="q-tag">💬 Question de relance · section 12</div>
+  <div class="q-question">Si votre agent fait une erreur demain, pourrez-vous rejouer exactement ce qu&#x27;il a vu et décidé ?</div>
+</section>
+<section class="slide slide-divider">
+  <div class="section-num">13</div>
+  <div class="section-tag">Section 13</div>
+  <h1 class="section-title">Navigateur, sandbox, voix et image</h1>
+  <p class="section-sub">Les outils périphériques que les agents appellent le plus souvent</p>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 13 · principe</div>
+  <h2 class="slide-title">Navigateur, sandbox, voix et image : de quoi parle-t-on ?</h2>
+  <div class="note" style="margin-top:0">Un agent utile exécute du code, navigue, lit de l&#x27;audio et des images. Chacune de ces capacités a son outil ouvert.</div>
+  <div class="cnt">12 entrées dans cette section, présentées par tableaux de 7.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 13 · Navigateur, sandbox, voix et image · 1/2</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Navigateur, sandbox, voix et image</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>browser-use</b></td><td class="lk"><a href="https://github.com/browser-use/browser-use" target="_blank" rel="noopener">browser-use/browser-use</a></td><td>Laisse un LLM piloter un navigateur (Python).</td></tr><tr><td class="nm"><b>Playwright</b></td><td class="lk"><a href="https://github.com/microsoft/playwright" target="_blank" rel="noopener">microsoft/playwright</a></td><td>Automatisation de navigateur : base de la plupart des agents web.</td></tr><tr><td class="nm"><b>Stagehand</b></td><td class="lk"><a href="https://github.com/browserbase/stagehand" target="_blank" rel="noopener">browserbase/stagehand</a></td><td>SDK d&#x27;automatisation web mêlant code et langage naturel.</td></tr><tr><td class="nm"><b>E2B</b></td><td class="lk"><a href="https://github.com/e2b-dev/E2B" target="_blank" rel="noopener">e2b-dev/E2B</a></td><td>Bacs à sable cloud pour exécuter le code généré par un agent.</td></tr><tr><td class="nm"><b>whisper.cpp</b></td><td class="lk"><a href="https://github.com/ggml-org/whisper.cpp" target="_blank" rel="noopener">ggml-org/whisper.cpp</a></td><td>Transcription audio locale rapide, même moteur ggml que llama.cpp.</td></tr><tr><td class="nm"><b>faster-whisper</b></td><td class="lk"><a href="https://github.com/SYSTRAN/faster-whisper" target="_blank" rel="noopener">SYSTRAN/faster-whisper</a></td><td>Whisper accéléré pour GPU et CPU.</td></tr><tr><td class="nm"><b>Whisper</b></td><td class="lk"><a href="https://github.com/openai/whisper" target="_blank" rel="noopener">openai/whisper</a></td><td>Le modèle de transcription d&#x27;origine, multilingue.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 13 · Navigateur, sandbox, voix et image · 2/2</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Navigateur, sandbox, voix et image</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Kokoro</b></td><td class="lk"><a href="https://huggingface.co/hexgrad/Kokoro-82M" target="_blank" rel="noopener">hf.co/hexgrad/Kokoro-82M</a></td><td>Synthèse vocale compacte (82M) qui tourne en local.</td></tr><tr><td class="nm"><b>ComfyUI</b></td><td class="lk"><a href="https://github.com/comfyanonymous/ComfyUI" target="_blank" rel="noopener">comfyanonymous/ComfyUI</a></td><td>Interface en graphe pour générer des images et vidéos avec modèles ouverts.</td></tr><tr><td class="nm"><b>diffusers</b></td><td class="lk"><a href="https://github.com/huggingface/diffusers" target="_blank" rel="noopener">huggingface/diffusers</a></td><td>Bibliothèque de génération d&#x27;images, vidéo et audio.</td></tr><tr><td class="nm"><b>Ultralytics</b></td><td class="lk"><a href="https://github.com/ultralytics/ultralytics" target="_blank" rel="noopener">ultralytics/ultralytics</a></td><td>Détection d&#x27;objets (YOLO) prête à l&#x27;emploi.</td></tr><tr><td class="nm"><b>Docker Model Runner</b></td><td class="lk"><a href="https://docs.docker.com/ai/model-runner/" target="_blank" rel="noopener">documentation</a></td><td>Exécute des modèles GGUF comme des conteneurs, utile pour l&#x27;intégration continue.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">À retenir · Navigateur, sandbox, voix et image</div>
+  <h2 class="slide-title">Ce qu'il faut garder de la section 13</h2>
+  <ul class="points"><li>Un agent qui exécute du code doit le faire <b>dans un bac à sable</b> : conteneur, réseau restreint, pas de secrets montés.</li><li>La transcription locale (whisper.cpp) règle de nombreux cas de confidentialité de réunions.</li></ul>
+</section>
+<section class="slide slide-question">
+  <div class="q-tag">💬 Question de relance · section 13</div>
+  <div class="q-question">Quelle tâche de votre équipe revient à « regarder un écran et cliquer » et pourrait être confiée à un agent navigateur ?</div>
+</section>
+<section class="slide slide-divider">
+  <div class="section-num">14</div>
+  <div class="section-tag">Section 14</div>
+  <h1 class="section-title">Apprendre et rester à jour</h1>
+  <p class="section-sub">Cours, dépôts pédagogiques et sources de veille à suivre</p>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 14 · principe</div>
+  <h2 class="slide-title">Apprendre et rester à jour : de quoi parle-t-on ?</h2>
+  <div class="note" style="margin-top:0">Les outils changent vite ; les cours ci-dessous restent valables parce qu&#x27;ils enseignent les mécanismes.</div>
+  <div class="cnt">16 entrées dans cette section, présentées par tableaux de 7.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 14 · Apprendre et rester à jour · 1/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Apprendre et rester à jour</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>LLMs-from-scratch</b></td><td class="lk"><a href="https://github.com/rasbt/LLMs-from-scratch" target="_blank" rel="noopener">rasbt/LLMs-from-scratch</a></td><td>Livre et code pour construire un LLM pas à pas (Sebastian Raschka).</td></tr><tr><td class="nm"><b>llm-course</b></td><td class="lk"><a href="https://github.com/mlabonne/llm-course" target="_blank" rel="noopener">mlabonne/llm-course</a></td><td>Feuille de route et notebooks : fondamentaux, ingénieur LLM, scientifique LLM.</td></tr><tr><td class="nm"><b>Hugging Face Agents Course</b></td><td class="lk"><a href="https://github.com/huggingface/agents-course" target="_blank" rel="noopener">huggingface/agents-course</a></td><td>Cours gratuit de création d&#x27;agents.</td></tr><tr><td class="nm"><b>smol-course</b></td><td class="lk"><a href="https://github.com/huggingface/smol-course" target="_blank" rel="noopener">huggingface/smol-course</a></td><td>Cours d&#x27;alignement et de fine-tuning de petits modèles.</td></tr><tr><td class="nm"><b>AI Agents for Beginners</b></td><td class="lk"><a href="https://github.com/microsoft/ai-agents-for-beginners" target="_blank" rel="noopener">microsoft/ai-agents-for-beginners</a></td><td>Leçons courtes en plusieurs langues, dont le français.</td></tr><tr><td class="nm"><b>Generative AI for Beginners</b></td><td class="lk"><a href="https://github.com/microsoft/generative-ai-for-beginners" target="_blank" rel="noopener">microsoft/generative-ai-for-beginners</a></td><td>21 leçons pour développeurs, à partir de zéro.</td></tr><tr><td class="nm"><b>Anthropic courses</b></td><td class="lk"><a href="https://github.com/anthropics/courses" target="_blank" rel="noopener">anthropics/courses</a></td><td>Cours officiels : API, ingénierie de prompts, utilisation d&#x27;outils.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 14 · Apprendre et rester à jour · 2/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Apprendre et rester à jour</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Prompt engineering interactive tutorial</b></td><td class="lk"><a href="https://github.com/anthropics/prompt-eng-interactive-tutorial" target="_blank" rel="noopener">anthropics/prompt-eng-interactive-tutorial</a></td><td>Tutoriel interactif en notebooks.</td></tr><tr><td class="nm"><b>Claude Cookbooks</b></td><td class="lk"><a href="https://github.com/anthropics/claude-cookbooks" target="_blank" rel="noopener">anthropics/claude-cookbooks</a></td><td>Recettes de code : RAG, outils, agents.</td></tr><tr><td class="nm"><b>OpenAI Cookbook</b></td><td class="lk"><a href="https://github.com/openai/openai-cookbook" target="_blank" rel="noopener">openai/openai-cookbook</a></td><td>Exemples d&#x27;usage de l&#x27;API.</td></tr><tr><td class="nm"><b>Prompt Engineering Guide</b></td><td class="lk"><a href="https://github.com/dair-ai/Prompt-Engineering-Guide" target="_blank" rel="noopener">dair-ai/Prompt-Engineering-Guide</a></td><td>Guide complet de techniques de prompts.</td></tr><tr><td class="nm"><b>Awesome-LLM</b></td><td class="lk"><a href="https://github.com/Hannibal046/Awesome-LLM" target="_blank" rel="noopener">Hannibal046/Awesome-LLM</a></td><td>Panorama des modèles, articles et outils.</td></tr><tr><td class="nm"><b>awesome-ai-agents</b></td><td class="lk"><a href="https://github.com/e2b-dev/awesome-ai-agents" target="_blank" rel="noopener">e2b-dev/awesome-ai-agents</a></td><td>Liste d&#x27;agents et de projets.</td></tr><tr><td class="nm"><b>r/LocalLLaMA</b></td><td class="lk"><a href="https://www.reddit.com/r/LocalLLaMA/" target="_blank" rel="noopener">reddit.com/r/LocalLLaMA</a></td><td>La communauté où les quantifications et correctifs sont discutés en premier.</td></tr></table>
+</section>
+<section class="slide">
+  <div class="slide-tag">Section 14 · Apprendre et rester à jour · 3/3</div>
+  <h2 class="slide-title" style="font-size:1.6rem;margin-bottom:.6rem">Apprendre et rester à jour</h2>
+  <table class="cmp tools"><tr><th>Outil</th><th>Lien</th><th>À savoir</th></tr><tr><td class="nm"><b>Hugging Face Papers</b></td><td class="lk"><a href="https://huggingface.co/papers" target="_blank" rel="noopener">huggingface.co/papers</a></td><td>Veille quotidienne des articles de recherche.</td></tr><tr><td class="nm"><b>Attention Is All You Need</b></td><td class="lk"><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">arxiv.org/abs/1706.03762</a></td><td>L&#x27;article fondateur du transformer, cité au Jour 1.</td></tr></table>
+</section>
+<section class="slide slide-question">
+  <div class="q-tag">💬 Question de relance · section 14</div>
+  <div class="q-question">Quelle source de veille êtes-vous prêt à suivre chaque semaine, et qui, dans l&#x27;équipe, en fait la synthèse ?</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Synthèse · parcours</div>
+  <h2 class="slide-title">Quoi installer, jour par jour</h2>
+  <table class="cmp tools">
+    <tr><th>Jour</th><th>Indispensable</th><th>Pour aller plus loin</th></tr>
+    <tr><td><b>Jour 1</b></td><td>Navigateur, VS Code, GitHub Copilot, Live Preview ; LM Studio pour le soir</td><td>Hugging Face (filtre GGUF), Tiktokenizer, Continue pour un modèle local dans l'éditeur</td></tr>
+    <tr><td><b>Jour 2</b></td><td>Un SDK de modèle, Instructor ou Pydantic AI pour les sorties structurées, une passerelle (LiteLLM)</td><td>Skills (anthropics/skills), AGENTS.md, Promptfoo pour tester les prompts</td></tr>
+    <tr><td><b>Jour 3</b></td><td>Python, Ollama ou LM Studio, Chroma, sentence-transformers, SDK MCP</td><td>Docling pour le parsing, Qdrant ou pgvector, Langfuse, Presidio</td></tr>
+    <tr><td><b>Bonus</b></td><td>Un harnais ouvert (OpenCode, Aider ou Cline) branché sur un modèle local</td><td>Unsloth pour un premier fine-tuning, vLLM pour un serveur partagé</td></tr>
+  </table>
+  <div class="note">La pile minimale qui suffit pour tout le programme : <b>un navigateur, un éditeur, un moteur local (Ollama ou LM Studio), une base vectorielle simple et un harnais</b>. Tout le reste s'ajoute au besoin.</div>
+  <div class="amorce">💬 Qu'ajouteriez-vous à cette pile pour votre contexte, et qu'en retireriez-vous ?</div>
+</section>
+<section class="slide slide-exercice">
+<div class="exo-tag">&#128295; Travaux pratiques</div>
+<h2 class="exo-title">Construire sa propre boîte à outils en une heure</h2>
+<div class="exo-duree">60 minutes · en binôme</div>
+<ol class="exo-steps">
+<li>Choisissez <b>un cas d'usage réel</b> de votre équipe (assistant documentaire, revue de code, extraction de factures…).</li>
+<li>Pour chaque catégorie du plan, <b>retenez un seul outil</b> et écrivez en une phrase pourquoi vous l'écartez les autres.</li>
+<li>Lancez un modèle local avec <b>Ollama ou LM Studio</b> et appelez-le depuis un script avec l'URL de base compatible OpenAI.</li>
+<li>Ouvrez les deux dépôts les plus importants de votre sélection : relevez <b>la licence, le dernier commit et le nombre de tickets ouverts</b>.</li>
+<li>Relevez dans la fiche d'un modèle GGUF : <b>licence, langue, taille, quantification choisie</b> et la mémoire que votre machine devra fournir.</li>
+<li>Rédigez les <b>trois risques</b> de votre pile (confidentialité, dépendance, maintenance) et une mesure pour chacun.</li>
+</ol>
+<div class="exo-livrable"><b>Livrable :</b> une page « pile technique » avec un outil par catégorie, une justification d'une phrase, et les trois risques avec leur parade.</div>
+</section>
+<section class="slide">
+  <div class="slide-tag">Sources</div>
+  <h2 class="slide-title">D'où viennent les informations de ce support</h2>
+  <ul class="points" style="font-size:.9rem">
+    <li>Harnais et agents CLI : <a href="https://pinggy.io/blog/best_open_source_cli_coding_agents/" target="_blank" rel="noopener">Pinggy, Best Open Source CLI Coding Agents (août 2026)</a> · <a href="https://openalternative.co/blog/best-open-source-ai-coding-agents" target="_blank" rel="noopener">OpenAlternative</a> · <a href="https://pinggy.io/blog/top_cli_based_ai_coding_agents/" target="_blank" rel="noopener">Pinggy, Top 5 CLI (juillet 2026)</a></li>
+    <li>Moteurs d'inférence : <a href="https://bizon-tech.com/blog/best-llm-inference-engines" target="_blank" rel="noopener">Bizon</a> · <a href="https://vrlatech.com/llm-inference-engine-comparison-2026/" target="_blank" rel="noopener">VRLA Tech</a> (statut de TGI) · <a href="https://bestllmfor.com/guides/ollama-vs-lm-studio-vs-llama-cpp-2026/" target="_blank" rel="noopener">bestllmfor.com</a></li>
+    <li>Skills et plugins : <a href="https://github.com/anthropics/skills" target="_blank" rel="noopener">anthropics/skills</a> · <a href="https://skillselion.com/guides/anthropic-skills-official-guide" target="_blank" rel="noopener">Skillselion</a> · <a href="https://www.besthub.dev/articles/10-high-star-claude-code-codex-github-repos-that-supercharge-your-coding-efficiency-295c22881da5" target="_blank" rel="noopener">BestHub</a></li>
+    <li>MCP : <a href="https://dev.to/nishilbhave/awesome-mcp-servers-65-ranked-by-whats-maintained-2026-17l0" target="_blank" rel="noopener">DEV, 65 serveurs classés par maintenance</a> · <a href="https://saaswithalex.pages.dev/posts/best-mcp-servers-developers/" target="_blank" rel="noopener">Best MCP Servers for Developers</a></li>
+    <li>Frameworks d'agents : <a href="https://geekflare.com/open-source/ai-agent-frameworks/" target="_blank" rel="noopener">Geekflare</a> · <a href="https://techsy.io/en/blog/best-ai-agent-frameworks-2026" target="_blank" rel="noopener">Techsy</a> · <a href="https://www.agentmail.to/blog/best-ai-agent-frameworks-2026" target="_blank" rel="noopener">AgentMail</a></li>
+    <li>Modèles ouverts : <a href="https://www.contextstudios.ai/guides/best-open-weight-llms-2026" target="_blank" rel="noopener">Context Studios</a> · <a href="https://capitalandcompute.net/blog/best-open-weight-ai-models-2026/" target="_blank" rel="noopener">Capital &amp; Compute</a></li>
+    <li>Quantification : <a href="https://unsloth.ai/docs/basics/unsloth-dynamic-2.0-ggufs" target="_blank" rel="noopener">Unsloth Dynamic GGUFs</a> · <a href="https://huggingface.co/docs/hub/gguf" target="_blank" rel="noopener">Hugging Face, GGUF</a></li>
+    <li>Fine-tuning : <a href="https://particula.tech/blog/unsloth-vs-axolotl-vs-llama-factory-vs-trl" target="_blank" rel="noopener">Particula</a> · <a href="https://buttondown.com/ultradune/archive/eval-003-fine-tuning-in-2026-axolotl-vs-unsloth" target="_blank" rel="noopener">EVAL #003</a></li>
+    <li>RAG et bases vectorielles : <a href="https://dupple.com/learn/best-vector-databases" target="_blank" rel="noopener">Dupple</a> · <a href="https://techsy.io/en/blog/best-vector-databases-2026" target="_blank" rel="noopener">Techsy</a></li>
+    <li>Évaluation : <a href="https://mlflow.org/articles/tags/rag-evaluation-tools/" target="_blank" rel="noopener">MLflow</a> · <a href="https://techsy.io/en/blog/llm-evaluation-framework-open-source" target="_blank" rel="noopener">Techsy</a></li>
+  </ul>
+  <div class="warn">Ces comparatifs sont des sources secondaires. Pour un choix d'architecture, <b>ouvrez le dépôt lui-même</b> : licence, date du dernier commit, tickets ouverts.</div>
+</section>
+<section class="slide">
+<div class="slide-tag">Bilan</div>
+<h2 class="slide-title">Les cinq idées à garder</h2>
+<ul class="points">
+<li><b>Le harnais compte autant que le modèle</b> : choisissez qui valide, où ça tourne, quels modèles se branchent.</li>
+<li><b>Le format suit le moteur</b> : GGUF pour le local, safetensors/AWQ pour les serveurs, MLX pour Apple.</li>
+<li><b>Q4_K_M ou Q5_K_M</b> pour commencer ; un modèle plus petit bien quantifié bat un gros modèle écrasé.</li>
+<li><b>Prompt, puis RAG, puis fine-tuning</b> : dans cet ordre, parce que le coût est multiplié par dix à chaque étape.</li>
+<li><b>Ce qui n'est pas mesuré n'est pas amélioré</b> : évaluez, tracez, anonymisez.</li>
+</ul>
+<div class="amorce">&#128172; Une action concrète à faire cette semaine avec cette boîte à outils : laquelle ?</div>
+</section>
+<section class="slide slide-cta">
+  <h2>À vous de jouer</h2>
+  <p>Installez un moteur local, téléchargez un modèle en Q4_K_M, et branchez-y un harnais ouvert.<br>Une heure suffit pour avoir une pile qui tourne sur votre machine.</p>
+  <div class="cta-links">
+    <a href="https://huggingface.co/models?library=gguf" target="_blank" rel="noopener">huggingface.co/models?library=gguf</a>
+    <a href="https://github.com/ggml-org/llama.cpp" target="_blank" rel="noopener">github.com/ggml-org/llama.cpp</a>
+    <a href="https://github.com/anthropics/skills" target="_blank" rel="noopener">github.com/anthropics/skills</a>
+  </div>
+</section>
+</div>
+<script>
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const progressBar = document.getElementById('progress');
+
+// Chaque slide de contenu porte déjà sa propre question d'amorce (.amorce),
+// écrite pour le sujet traité. Le mécanisme ci-dessous ne s'applique donc
+// qu'aux slides qui n'en auraient pas : il garantit qu'aucune slide
+// ne reste sans question à poser au groupe.
+const relanceTemplates = [
+  t => `\u{1F4AC} À demander au groupe : qu'est-ce que « ${t} » change dans votre façon de coder ?`,
+  t => `\u{1F4AC} Tour de table éclair : qui a déjà rencontré ce cas dans un projet ?`,
+  t => `\u{1F4AC} Une minute de réflexion : sur une échelle de 1 à 5, ce point est-il maîtrisé chez vous ?`,
+  t => `\u{1F4AC} Question flash : quel est le principal risque si l'on ignore ce point ?`,
+  t => `\u{1F4AC} Discussion : sur quel projet en cours pourriez-vous appliquer cela dès demain ?`,
+  t => `\u{1F4AC} À chaud : qu'est-ce qui vous surprend le plus dans « ${t} » ?`,
+];
+slides.forEach((s, i) => {
+  if (s.classList.contains('slide-question') || s.classList.contains('slide-cover')) return;
+  if (s.querySelector('.amorce')) return;
+  const titleEl = s.querySelector('.slide-title, .section-title, .an-title, .demo-title, .exo-title, .code-title, .quote-text');
+  const title = titleEl ? titleEl.textContent.trim() : '';
+  const div = document.createElement('div');
+  div.className = 'mini-relance';
+  div.textContent = relanceTemplates[i % relanceTemplates.length](title);
+  s.appendChild(div);
+});
+
+function goTo(n){
+  slides[current].classList.remove('active');
+  current = Math.max(0, Math.min(n, slides.length - 1));
+  slides[current].classList.add('active');
+  progressBar.style.width = ((current + 1) / slides.length * 100) + '%';
+  document.getElementById('counter').textContent = (current + 1) + ' / ' + slides.length;
+  slides[current].scrollTop = 0;
+  try { location.hash = 's' + (current + 1); } catch (e) {}
+}
+document.getElementById('prevBtn').addEventListener('click', ()=>goTo(current-1));
+document.getElementById('nextBtn').addEventListener('click', ()=>goTo(current+1));
+document.getElementById('pdfBtn').addEventListener('click', ()=>window.print());
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') goTo(current + 1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(current - 1);
+  if (e.key === 'Home') goTo(0);
+  if (e.key === 'End') goTo(slides.length - 1);
+  if (e.key === 'p' || e.key === 'P') window.print();
+});
+let xStart = null;
+document.addEventListener('touchstart', e => { xStart = e.changedTouches[0].screenX; });
+document.addEventListener('touchend', e => {
+  const diff = xStart - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 50) diff > 0 ? goTo(current + 1) : goTo(current - 1);
+});
+const depart = parseInt((location.hash || '').replace('#s', ''), 10);
+goTo(Number.isFinite(depart) && depart > 0 ? depart - 1 : 0);
+</script>
+</body>
+</html>
