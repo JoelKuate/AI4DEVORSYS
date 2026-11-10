@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Copilot — Formation pratique (124 slides) — Transactis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBFBF8; --bg2:#F2F0E9; --accent:#1B3A5C; --accent2:#2C5C8F;
+  --text:#16161B; --text-dim:#3c3c46; --text-mute:#6b6b76;
+  --card:#FFFFFF; --card-border:#DDE3EC; --sec:#E8EEF7;
+  --gold:#B9862E; --green:#1E7A46; --red:#B23A3A;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow:hidden;}
+.deck{position:relative;width:100vw;height:100vh;}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:50px 84px 80px 84px;background:var(--bg);overflow-y:auto;}
+.slide.active{display:flex;animation:fade .35s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.progress-wrap{position:fixed;top:0;left:0;width:100%;height:4px;background:var(--sec);z-index:50;}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));width:0%;transition:width .3s;}
+.counter{position:fixed;bottom:16px;right:26px;font-size:.74rem;color:var(--text-mute);z-index:50;font-family:'JetBrains Mono',monospace;}
+.navbtn{position:fixed;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;
+  background:#fff;border:1px solid var(--card-border);color:var(--accent);box-shadow:0 2px 8px rgba(27,58,92,.12);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:50;font-size:1.25rem;user-select:none;}
+.navbtn:hover{background:var(--accent);color:#fff;}
+#prevBtn{left:18px;} #nextBtn{right:18px;}
+.tag-brand{position:fixed;bottom:16px;left:26px;font-size:.68rem;color:var(--text-mute);z-index:50;letter-spacing:.05em;}
+.slide-tag,.section-tag,.exo-tag{display:inline-block;font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--accent);background:var(--sec);border:1px solid #cfdcec;padding:5px 13px;border-radius:20px;margin-bottom:12px;width:fit-content;font-weight:600;}
+.slide-title{font-size:1.75rem;font-weight:700;margin:0 0 14px 0;line-height:1.22;color:var(--accent);}
+.section-title{font-size:2.6rem;font-weight:800;margin:8px 0 10px 0;max-width:900px;color:var(--accent);}
+.section-sub{font-size:1.05rem;color:var(--text-dim);max-width:700px;}
+.points{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-width:980px;}
+.points li{position:relative;padding-left:26px;font-size:.98rem;line-height:1.5;color:var(--text-dim);}
+.points li::before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:50%;background:var(--accent2);}
+.points li b,.points li strong{color:var(--text);}
+.para{font-size:.98rem;line-height:1.68;color:var(--text-dim);max-width:960px;margin:0 0 12px 0;}
+.para b,.para strong{color:var(--text);}
+.para:last-of-type{margin-bottom:0;}
+.note{margin-top:14px;padding:12px 16px;background:var(--sec);border-left:4px solid var(--gold);border-radius:6px;
+  font-size:.88rem;color:var(--text-dim);max-width:960px;}
+.question{margin-top:12px;padding:10px 16px;background:#FFF6E5;border:1.5px dashed var(--gold);border-radius:10px;
+  font-size:.86rem;color:#6b4e0e;max-width:960px;}
+.question b{color:var(--gold);}
+.source{margin-top:10px;padding:7px 13px;background:#F4F7FB;border-radius:6px;font-size:.72rem;color:var(--text-mute);font-style:italic;max-width:960px;border:1px solid var(--card-border);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1040px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;max-width:1080px;}
+.card{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:14px 16px;box-shadow:0 1px 3px rgba(27,58,92,.06);}
+.card h4{margin:0 0 6px 0;color:var(--accent);font-size:.92rem;}
+.card p{color:var(--text-dim);font-size:.84rem;line-height:1.45;margin:0;}
+code{font-family:'JetBrains Mono',monospace;background:var(--sec);color:var(--accent);padding:2px 6px;border-radius:4px;font-size:.85em;}
+.codeblock{font-family:'JetBrains Mono',monospace;background:#12213a;border:1px solid var(--card-border);
+  border-radius:8px;padding:12px 16px;font-size:.76rem;color:#bfe6c9;white-space:pre-wrap;line-height:1.5;max-width:980px;margin-top:6px;}
+table.ref{border-collapse:collapse;width:100%;max-width:1080px;font-size:.82rem;}
+table.ref th{background:var(--accent);color:#fff;text-align:left;padding:7px 12px;font-size:.7rem;text-transform:uppercase;letter-spacing:.03em;}
+table.ref td{padding:6px 12px;border-bottom:1px solid var(--card-border);color:var(--text-dim);vertical-align:top;}
+table.ref tr:nth-child(even) td{background:var(--sec);}
+.slide-divider{justify-content:center;background:linear-gradient(160deg,#F2F5FA,var(--bg));}
+.slide-exercice{background:linear-gradient(160deg,#FBF7EC,var(--bg));}
+.slide-ref{background:linear-gradient(160deg,#F4F8FB,var(--bg));}
+.exo-tag{background:#FBF0DB;border-color:#EAD3A0;color:var(--gold);}
+.exo-title{font-size:1.6rem;font-weight:700;margin:4px 0 4px 0;color:var(--accent);}
+.exo-steps{margin:0;padding-left:20px;max-width:940px;}
+.exo-steps li{margin-bottom:6px;font-size:.92rem;color:var(--text-dim);line-height:1.45;}
+.exo-steps li::marker{color:var(--gold);font-weight:700;}
+.exo-livrable{margin-top:12px;padding:12px 16px;background:#EAF6EE;border:1px solid #bfe3c9;border-radius:8px;color:var(--green);font-size:.84rem;}
+.slide-cover{justify-content:center;align-items:flex-start;background:
+  radial-gradient(circle at 85% 10%,rgba(27,58,92,.08),transparent 55%),
+  radial-gradient(circle at 10% 90%,rgba(185,134,46,.08),transparent 55%),var(--bg);}
+.cover-org{font-size:.9rem;color:var(--gold);letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px;font-weight:600;}
+.cover-title{font-size:2.7rem;font-weight:800;line-height:1.15;max-width:920px;color:var(--accent);}
+.cover-client{font-size:1.7rem;font-weight:700;color:var(--accent2);margin-top:4px;}
+.cover-sub{font-size:1rem;color:var(--text-dim);margin-top:16px;max-width:760px;}
+.cover-meta{margin-top:22px;display:flex;gap:12px;flex-wrap:wrap;}
+.cover-meta span{font-size:.76rem;color:var(--accent);border:1px solid var(--card-border);background:#fff;padding:6px 14px;border-radius:20px;}
+.cover-email{margin-top:20px;font-size:.94rem;color:var(--accent2);font-weight:600;}
+.bio-wrap{display:flex;gap:40px;align-items:flex-start;max-width:1080px;}
+.bio-name{font-size:1.7rem;font-weight:700;color:var(--accent);}
+.bio-role{color:var(--gold);font-size:.94rem;margin-bottom:14px;}
+.bio-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:7px;}
+.bio-list li{color:var(--text-dim);font-size:.88rem;padding-left:18px;position:relative;}
+.bio-list li::before{content:"—";position:absolute;left:0;color:var(--accent2);}
+.agenda-table{width:100%;max-width:1080px;border-collapse:collapse;font-size:.8rem;}
+.agenda-table td{padding:6px 13px;border-bottom:1px solid var(--card-border);}
+.agenda-table td:first-child{color:var(--gold);font-family:'JetBrains Mono',monospace;white-space:nowrap;font-size:.75rem;}
+.agenda-table td:nth-child(2){color:var(--text);font-weight:600;}
+.agenda-table td:nth-child(3){color:var(--text-mute);}
+.recap-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:1040px;}
+.recap-item{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:12px 15px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 1px 3px rgba(27,58,92,.06);}
+.recap-num{font-size:1.3rem;font-weight:800;color:var(--accent2);font-family:'JetBrains Mono',monospace;}
+.recap-item p{margin:0;color:var(--text-dim);font-size:.85rem;line-height:1.45;}
+.slide-cta{justify-content:center;align-items:center;text-align:center;background:
+  radial-gradient(circle at 50% 30%,rgba(27,58,92,.08),transparent 60%),var(--bg);}
+.slide-cta h2{font-size:2.6rem;margin-bottom:8px;color:var(--accent);}
+.slide-cta p{color:var(--text-dim);font-size:1rem;margin-bottom:24px;}
+.cta-links{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
+.cta-links a{color:#fff;background:var(--accent);padding:11px 24px;border-radius:30px;text-decoration:none;font-weight:600;font-size:.9rem;}
+.cta-links a:nth-child(2){background:transparent;color:var(--text);border:1px solid var(--card-border);}
+.cta-links a:nth-child(3){background:transparent;color:var(--gold);border:1px solid var(--gold);}
+.cta-socials{margin-top:18px;color:var(--text-mute);font-size:.8rem;}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.badge{font-size:.68rem;padding:4px 11px;border-radius:14px;background:var(--sec);color:var(--accent);border:1px solid #cfdcec;}
+.tier-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.tier{font-size:.68rem;font-weight:700;padding:5px 12px;border-radius:14px;}
+.tier.beg{background:#E6F4EA;color:var(--green);}
+.tier.mid{background:#FFF3D6;color:#8a6a10;}
+.tier.pro{background:#FBE7E7;color:var(--red);}
+.diagram-wrap{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:14px;max-width:1000px;margin-top:6px;}
+.diagram-wrap svg{width:100%;height:auto;display:block;}
+::-webkit-scrollbar{width:8px;}
+::-webkit-scrollbar-thumb{background:var(--card-border);border-radius:4px;}
+#exportPdfBtn{position:fixed;top:14px;right:26px;z-index:60;display:flex;align-items:center;gap:6px;
+  background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:20px;font-family:'Poppins',sans-serif;
+  font-size:.78rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(27,58,92,.18);}
+#exportPdfBtn:hover{background:var(--accent2);}
+@media print{
+  #exportPdfBtn,.navbtn,.progress-wrap,.counter,.tag-brand{display:none!important;}
+  html,body{overflow:visible!important;height:auto!important;background:#fff!important;}
+  .deck{position:static;width:auto;height:auto;}
+  .slide{position:static!important;display:flex!important;opacity:1!important;transform:none!important;
+    height:auto;min-height:100vh;page-break-after:always;break-after:page;overflow:visible!important;}
+  .slide:last-child{page-break-after:auto;break-after:auto;}
+}
+</style>
+</head>
+<body>
+<div class="progress-wrap"><div class="progress-bar" id="progress"></div></div>
+<div class="counter" id="counter">1 / 1</div>
+<div class="tag-brand">Digital House Company · hello@dhcompany.pro</div>
+<div class="navbtn" id="prevBtn">‹</div>
+<div class="navbtn" id="nextBtn">›</div>
+<button id="exportPdfBtn" type="button" title="Ouvre la boîte d'impression du navigateur — choisissez « Enregistrer au format PDF »">⬇ Exporter en PDF</button>
+
+<div class="deck">
+
+<section class="slide slide-cover">
+  <div class="cover-org">Formation pratique — 124 slides</div>
+  <div class="cover-title">GitHub Copilot, en pratique</div>
+  <div class="cover-client">Transactis</div>
+  <p class="cover-sub">Commandes, coûts, agents, MCP, skills, hooks, plugins, workflows. Français simple, zéro blabla, tout sourcé. Basé sur docs.github.com/copilot, code.visualstudio.com et github.com/github/awesome-copilot.</p>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 900 220" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="450" cy="110" r="46" fill="#1B3A5C"/>
+      <text x="450" y="115" text-anchor="middle" fill="#fff" font-family="Poppins" font-size="15" font-weight="700">Copilot</text>
+      <g stroke="#B9862E" stroke-width="2" fill="none">
+        <line x1="450" y1="110" x2="180" y2="40"/><line x1="450" y1="110" x2="180" y2="110"/><line x1="450" y1="110" x2="180" y2="180"/>
+        <line x1="450" y1="110" x2="720" y2="40"/><line x1="450" y1="110" x2="720" y2="110"/><line x1="450" y1="110" x2="720" y2="180"/>
+      </g>
+      <g font-family="Poppins" font-size="13" fill="#2C5C8F">
+        <circle cx="180" cy="40" r="26" fill="#E8EEF7" stroke="#2C5C8F"/><text x="180" y="45" text-anchor="middle">IDE</text>
+        <circle cx="180" cy="110" r="26" fill="#E8EEF7" stroke="#2C5C8F"/><text x="180" y="115" text-anchor="middle">CLI</text>
+        <circle cx="180" cy="180" r="26" fill="#E8EEF7" stroke="#2C5C8F"/><text x="180" y="185" text-anchor="middle">App</text>
+        <circle cx="720" cy="40" r="26" fill="#E8EEF7" stroke="#2C5C8F"/><text x="720" y="45" text-anchor="middle">MCP</text>
+        <circle cx="720" cy="110" r="30" fill="#E8EEF7" stroke="#2C5C8F"/><text x="720" y="115" text-anchor="middle">Agent</text>
+        <circle cx="720" cy="180" r="30" fill="#E8EEF7" stroke="#2C5C8F"/><text x="720" y="185" text-anchor="middle">Skill</text>
+      </g>
+    </svg>
+  </div>
+  <div class="cover-meta"><span>1 jour · pratique</span><span>Sources 100% citées</span><span>Exercice : TaskBoard (HTML/CSS uniquement)</span></div>
+  <div class="cover-email">hello@dhcompany.pro</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Formateur</div>
+  <h2 class="slide-title">Qui je suis</h2>
+  <div class="bio-wrap">
+    <div>
+      <div class="bio-name">Joël Parfait Kuate</div>
+      <div class="bio-role">Ingénieur IA · Consultant &amp; Formateur certifié</div>
+      <ul class="bio-list">
+        <li>Master en Architecture Logicielle &amp; Big Data</li>
+        <li>7+ ans de formation — 600+ organisations formées en Belgique</li>
+        <li>Fondateur : Digital House Company (Belgique), MS JOYCE SARL (Cameroun)</li>
+        <li>Auteur : « L'Afrique et l'Intelligence Artificielle » (2024)</li>
+        <li>Projets : ia4africa.org · FormIA · SANDYKIT · Jurisis.be · Indibot.be</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note">hello@dhcompany.pro · @DigitalMaker237</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Mode d'emploi</div>
+  <h2 class="slide-title">3 documents, un seul dossier</h2>
+  <div class="three-col">
+    <div class="card"><h4>1. Ce support (124 slides)</h4><p>Théorie condensée, toutes les commandes, coûts, agents, MCP, skills, hooks, plugins, workflows. Chaque fait cite sa source.</p></div>
+    <div class="card"><h4>2. Exercice_Pratique_10_Etapes_3_Niveaux.md</h4><p>10 étapes, chacune en 3 pistes : 🟢 Facile, 🟡 Intermédiaire, 🔴 Pro.</p></div>
+    <div class="card"><h4>3. codebase_taskboard/</h4><p>Un site HTML/CSS uniquement (12 fichiers, aucun JavaScript) à manipuler avec Copilot.</p></div>
+  </div>
+  <div class="question"><b>❓</b> Avez-vous déjà utilisé Copilot sur un projet front-end (HTML/CSS) ?</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Sourçage</div>
+  <h2 class="slide-title">Convention : chaque info cite sa source</h2>
+  <ul class="points"><li>Ligne <b>Source</b> sous chaque slide technique : documentation officielle exacte, consultée le 19/07/2026.</li><li>3 familles de sources : <b>GitHub Docs</b> (docs.github.com/copilot), <b>VS Code Docs</b> (code.visualstudio.com), <b>awesome-copilot</b> (github.com/github/awesome-copilot).</li><li>2 slides récapitulatives en fin de support listent toutes les URLs utilisées.</li></ul>
+  <div class="question"><b>❓</b> Pourquoi vérifier la source d'une information technique plutôt que de la prendre telle quelle ?</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Programme</div>
+  <h2 class="slide-title">Agenda de la journée</h2>
+  <table class="agenda-table">
+    <tr><td>09h00-09h30</td><td>Fondamentaux</td><td>Panorama Copilot, gratuit vs payant</td></tr>
+    <tr><td>09h30-10h15</td><td>Coûts &amp; sobriété</td><td>AI Credits, tokens, optimisation</td></tr>
+    <tr><td>10h15-11h15</td><td>Fiche de référence</td><td>Toutes les commandes, tous les modèles</td></tr>
+    <tr><td>11h15-12h15</td><td>Agents &amp; écosystème avancé</td><td>Agent mode, cloud agent, MCP, skills, hooks, plugins, workflows</td></tr>
+    <tr><td>12h15-13h15</td><td>Pause déjeuner</td><td>—</td></tr>
+    <tr><td>13h15-14h00</td><td>Personnalisation (VS Code)</td><td>copilot-instructions.md, applyTo, AGENTS.md</td></tr>
+    <tr><td>14h00-14h45</td><td>Bien formuler sa demande</td><td>Prompt engineering officiel</td></tr>
+    <tr><td>14h45-15h00</td><td>Sécurité</td><td>Les règles Transactis</td></tr>
+    <tr><td>15h00-17h30</td><td>Pratique sur TaskBoard</td><td>Exercice en 10 étapes, 3 niveaux</td></tr>
+    <tr><td>17h30-17h45</td><td>Synthèse</td><td>Plan d'action</td></tr>
+  </table>
+</section>
+
+<section class="slide slide-divider">
+  <div class="section-tag">Culture IA</div>
+  <h1 class="section-title">Comprendre l'IA avant d'utiliser Copilot</h1>
+  <p class="section-sub">Définitions, types, niveaux, modèles, LLM, et comment on les compare — pour poser des bases solides avant la pratique.</p>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Définition</div>
+  <h2 class="slide-title">Qu'est-ce que l'intelligence artificielle ?</h2>
+  <p class="para">L'intelligence artificielle (IA) désigne l'ensemble des techniques qui permettent à une machine de réaliser des tâches qui, jusqu'ici, demandaient une forme d'intelligence humaine : reconnaître une image, comprendre une phrase, jouer aux échecs, ou écrire une ligne de code. Ce n'est pas une seule technologie, mais une famille de méthodes très différentes, qui partagent un même objectif : produire un comportement « intelligent » à partir de données et de calcul, sans que chaque règle soit écrite à la main par un humain.</p>
+  <p class="para">Il est important de garder une distinction claire en tête tout au long de cette formation : une IA <b>simule</b> un comportement intelligent en repérant des régularités statistiques dans d'énormes quantités de données. Elle ne « comprend » pas au sens où un humain comprend, elle ne possède ni conscience ni intentions. C'est cette nuance qui explique pourquoi Copilot peut produire une réponse qui a l'air juste, mais qui est fausse — et pourquoi la vérification humaine reste indispensable tout au long de cette journée.</p>
+  <div class="question"><b>❓</b> Avant cette formation, comment auriez-vous défini « l'intelligence artificielle » en une phrase ?</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Types d'IA — par technique</div>
+  <h2 class="slide-title">Systèmes à règles et Machine Learning</h2>
+  <p class="para">La façon la plus courante de classer les IA est de regarder <b>comment elles apprennent à faire ce qu'elles font</b>. Les tout premiers systèmes, dits « à base de règles » (rule-based), suivaient uniquement des instructions écrites explicitement par un développeur : « si la température dépasse 30°, alors afficher une alerte ». Ils sont prévisibles, mais rigides : ils ne savent traiter que les cas prévus à l'avance.</p>
+  <p class="para">Le <b>Machine Learning</b> (apprentissage automatique) change d'approche : au lieu d'écrire les règles, on montre à l'algorithme des milliers d'exemples (des données), et c'est lui qui « apprend » à repérer les régularités. Un modèle de Machine Learning entraîné à reconnaître des e-mails indésirables n'a jamais reçu la règle « si le mot GRATUIT apparaît 5 fois »  — il l'a déduite lui-même à partir d'exemples réels.</p>
+  <div class="question"><b>❓</b> Dans votre travail quotidien, utilisez-vous déjà un outil basé sur des règles fixes (ex. un correcteur orthographique simple) ?</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Types d'IA — par technique</div>
+  <h2 class="slide-title">Deep Learning et IA générative</h2>
+  <p class="para">Le <b>Deep Learning</b> (apprentissage profond) est une famille particulière de Machine Learning, basée sur des « réseaux de neurones artificiels » empilés en plusieurs couches — d'où le mot « profond ». C'est cette technique qui a rendu possibles les grandes avancées récentes : reconnaissance vocale, traduction automatique, génération d'images, et les modèles de langage comme ceux qui alimentent GitHub Copilot.</p>
+  <p class="para">L'<b>IA générative</b> est une application du Deep Learning : au lieu de simplement classer ou reconnaître une donnée, elle en <b>produit une nouvelle</b> — un texte, une image, une ligne de code — qui n'existait pas telle quelle auparavant, mais qui est statistiquement cohérente avec tout ce que le modèle a appris. C'est exactement ce que fait Copilot lorsqu'il propose une fonction que vous n'avez jamais écrite : il ne la « copie » pas, il la génère token par token, comme le module suivant va l'expliquer.</p>
+  <div class="source">Source : classification usuelle de l'IA par technique (systèmes à règles, Machine Learning, Deep Learning, IA générative), reprise notamment par IBM et Google Cloud dans leurs ressources pédagogiques grand public.</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Niveaux d'IA — par capacité</div>
+  <h2 class="slide-title">IA étroite, IA générale, super-IA</h2>
+  <p class="para">Une seconde classification, complémentaire à la première, distingue les IA non plus par leur technique, mais par l'<b>étendue de leurs capacités</b>. On parle alors de 3 niveaux. L'<b>IA étroite</b> (Narrow AI, ou ANI) est excellente sur une tâche précise et uniquement celle-ci : un système d'échecs ne sait pas conduire une voiture, un correcteur de code ne sait pas composer de la musique. <b>Toutes les IA existantes aujourd'hui, y compris GitHub Copilot et les modèles les plus avancés, sont des IA étroites</b> — même si elles semblent polyvalentes, elles restent spécialisées dans le traitement de texte, d'image ou de code.</p>
+  <p class="para">L'<b>IA générale</b> (AGI, Artificial General Intelligence) désigne une IA hypothétique capable d'apprendre et de raisonner sur n'importe quelle tâche intellectuelle, au niveau d'un humain — elle n'existe pas encore. La <b>super-IA</b> (ASI, Artificial Super Intelligence) irait au-delà des capacités humaines dans tous les domaines. Ces deux derniers niveaux relèvent aujourd'hui de la recherche et de la prospective, pas d'un outil que vous utiliserez cette semaine.</p>
+  <div class="note">Retenez ceci pour la suite de la journée : Copilot est une IA étroite, très performante sur le code, mais sans compréhension générale du monde ni de votre contexte métier — d'où l'importance de la revue humaine.</div>
+  <div class="question"><b>❓</b> Cette distinction ANI/AGI/ASI change-t-elle votre façon de vous représenter Copilot ?</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Modèles</div>
+  <h2 class="slide-title">Qu'est-ce qu'un modèle d'IA ?</h2>
+  <p class="para">Un <b>modèle</b> est le résultat concret de l'entraînement d'une IA : un ensemble de paramètres numériques (souvent plusieurs milliards) qui encodent, sous forme de calculs mathématiques, tout ce que le système a « appris » à partir de ses données d'entraînement. Concrètement, un modèle est un fichier — très volumineux — que l'on peut interroger : on lui donne une entrée (une question, du code), il produit une sortie (une réponse, une suggestion), en quelques fractions de seconde.</p>
+  <p class="para">Quand vous ouvrez le sélecteur de modèle dans Copilot Chat, vous choisissez littéralement <b>quel fichier de paramètres</b> va traiter votre demande. Deux modèles différents (par exemple GPT-5.4 et Claude Sonnet 5) ont été entraînés séparément, par des équipes différentes, sur des données et avec des méthodes différentes : ils donneront donc des réponses différentes à la même question, avec des forces et un coût différents — c'est tout l'enjeu du choix de modèle abordé plus loin dans ce support.</p>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">LLM</div>
+  <h2 class="slide-title">Qu'est-ce qu'un LLM (grand modèle de langage) ?</h2>
+  <p class="para">Un <b>LLM</b> (Large Language Model, « grand modèle de langage ») est un type particulier de modèle d'IA générative, spécialisé dans le traitement du texte — et, pour les modèles utilisés par Copilot, également du code source. Il est dit « large » (grand) parce qu'il est entraîné sur des quantités massives de texte (une bonne partie du contenu public d'internet, des livres, et énormément de code source) et parce qu'il compte des milliards de paramètres internes.</p>
+  <p class="para">Le principe de fonctionnement, une fois entraîné, est étonnamment simple à décrire : un LLM ne fait, techniquement, qu'une seule chose — <b>prédire le prochain mot (ou fragment de mot, appelé « token »)</b> le plus probable, étant donné tout ce qui a été écrit avant. Il répète cette opération token après token, des milliers de fois par seconde, pour construire une réponse complète. Cette simplicité de principe explique à la fois sa puissance (il a vu tellement d'exemples qu'il « devine » remarquablement bien) et ses limites (il n'y a, à aucun moment, une vérification de véracité — seulement une continuation statistiquement plausible).</p>
+  <div class="question"><b>❓</b> Le fait qu'un LLM « prédise juste le mot suivant » change-t-il votre confiance dans ses réponses ?</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">LLM</div>
+  <h2 class="slide-title">Comment un LLM « apprend »</h2>
+  <p class="para">L'entraînement d'un LLM se déroule, très schématiquement, en deux grandes phases. La première, le <b>pré-entraînement</b>, consiste à faire lire au modèle d'énormes quantités de texte et de code, en lui faisant deviner, des milliards de fois, le mot suivant d'une phrase tronquée — puis en corrigeant légèrement ses paramètres internes à chaque erreur. C'est un processus purement statistique, sans compréhension consciente, mais qui, à cette échelle, produit des capacités de langage et de raisonnement remarquablement utiles.</p>
+  <p class="para">La seconde phase, l'<b>alignement</b> (fine-tuning et apprentissage par retour humain), ajuste ensuite le modèle pour qu'il réponde de façon utile, sûre et conforme aux instructions — c'est ce qui transforme un modèle « qui complète du texte » en un assistant « qui répond à une question ». C'est cette seconde phase qui rend Copilot capable de comprendre une consigne comme <code>/explain</code> plutôt que de simplement continuer votre phrase.</p>
+  <div class="note">Ce que cela veut dire pour vous : un LLM ne « sait » rien au sens humain — il génère la continuation la plus plausible. D'où la règle d'or déjà vue : toujours vérifier.</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Comparer les modèles</div>
+  <h2 class="slide-title">Arena.ai : comparer et classer les modèles</h2>
+  <p class="para"><b>Arena.ai</b> (anciennement connu sous le nom de LMArena / Chatbot Arena) est une plateforme publique, indépendante des éditeurs de modèles, qui permet de comparer les LLM entre eux de façon transparente. Son principe, appelé « Battle Mode », est simple : un même prompt est envoyé à deux modèles différents, sans que l'utilisateur sache lesquels ; il vote ensuite pour la meilleure réponse. Des milliers de votes de ce type, agrégés, produisent un <b>classement (leaderboard)</b> public, régulièrement mis à jour, qui reflète les préférences réelles des utilisateurs plutôt que les seules annonces marketing des éditeurs.</p>
+  <p class="para">Ce classement est une ressource précieuse pour choisir un modèle par défaut d'équipe dans Copilot : plutôt que de se fier uniquement au nom le plus récent, on peut consulter comment un modèle se positionne réellement, y compris sur des catégories spécifiques comme la génération de code.</p>
+  <div class="note">Point de vigilance signalé par la plateforme elle-même : vos échanges peuvent être transmis aux fournisseurs des modèles testés — n'y soumettez jamais de code ou de donnée sensible, exactement comme pour Copilot.</div>
+  <div class="source">Source : arena.ai (anciennement lmarena.ai), consulté le 19/07/2026.</div>
+  <div class="question"><b>❓</b> Consulteriez-vous un classement communautaire avant de choisir un modèle par défaut pour votre équipe ?</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Transition</div>
+  <h2 class="slide-title">Pourquoi tout cela compte pour Copilot</h2>
+  <p class="para">Ces notions ne sont pas de la théorie détachée de la pratique : elles expliquent directement ce que vous allez faire cet après-midi sur TaskBoard. Quand vous choisirez un modèle dans le sélecteur, vous choisirez un LLM précis, entraîné différemment des autres, avec des forces différentes. Quand Copilot proposera un code, vous saurez qu'il s'agit d'une prédiction statistique plausible, pas d'une vérité vérifiée — d'où l'importance de chaque checklist de ce support. Et quand nous parlerons de coûts, vous comprendrez pourquoi un « grand » modèle de langage, plus lourd à faire tourner, coûte plus cher qu'un modèle « mini ».</p>
+  <div class="question"><b>❓</b> Une dernière question avant de continuer : quelle notion de ce module allez-vous réexpliquer à un collègue cette semaine ?</div>
+</section>
+
+<section class="slide slide-divider">
+  <div class="section-tag">Fondamentaux</div>
+  <h1 class="section-title">Panorama GitHub Copilot</h1>
+  <p class="section-sub">Ce que c'est, où on le trouve, ce qui est gratuit.</p>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Base</div>
+  <h2 class="slide-title">C'est quoi, GitHub Copilot ?</h2>
+  <p class="para">GitHub Copilot est un assistant IA construit autour de modèles de langage (les LLM que nous venons de définir), entraînés notamment sur du code source, et connecté directement à votre projet et à votre éditeur. Contrairement à un chat généraliste, il a accès à vos fichiers, à votre structure de projet et à l'historique de votre conversation, ce qui lui permet de répondre en tenant compte du contexte réel de votre travail plutôt que de généralités.</p>
+  <p class="para">Le principe reste toutefois identique à celui de n'importe quel LLM : Copilot <b>propose</b>, vous <b>décidez</b>. Chaque suggestion, chaque ligne de code générée, doit être lue et vérifiée avant d'être acceptée — ce n'est pas une précaution excessive, c'est une conséquence directe de la façon dont un modèle de langage fonctionne, comme nous venons de le voir.</p>
+  <div class="source">Source : GitHub Docs, « What is GitHub Copilot? » — docs.github.com/en/copilot/get-started/what-is-github-copilot (consulté le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Qu'attendez-vous personnellement de Copilot sur vos projets front-end ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Panorama</div>
+  <h2 class="slide-title">Où trouve-t-on Copilot ?</h2>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="380" y="80" width="140" height="46" rx="10" fill="#1B3A5C"/>
+      <text x="450" y="108" text-anchor="middle" fill="#fff" font-family="Poppins" font-size="15" font-weight="700">Copilot</text>
+      <g stroke="#B9862E" stroke-width="2"><line x1="380" y1="103" x2="120" y2="30"/><line x1="380" y1="103" x2="120" y2="103"/><line x1="380" y1="103" x2="120" y2="176"/><line x1="520" y1="103" x2="780" y2="30"/><line x1="520" y1="103" x2="780" y2="103"/><line x1="520" y1="103" x2="780" y2="176"/></g>
+      <g font-family="Poppins" font-size="12" fill="#2C5C8F">
+        <rect x="40" y="10" width="160" height="40" rx="8" fill="#E8EEF7" stroke="#2C5C8F"/><text x="120" y="35" text-anchor="middle">VS Code / Visual Studio</text>
+        <rect x="40" y="83" width="160" height="40" rx="8" fill="#E8EEF7" stroke="#2C5C8F"/><text x="120" y="108" text-anchor="middle">JetBrains / Xcode</text>
+        <rect x="40" y="156" width="160" height="40" rx="8" fill="#E8EEF7" stroke="#2C5C8F"/><text x="120" y="181" text-anchor="middle">Terminal (CLI)</text>
+        <rect x="700" y="10" width="160" height="40" rx="8" fill="#E8EEF7" stroke="#2C5C8F"/><text x="780" y="35" text-anchor="middle">github.com</text>
+        <rect x="700" y="83" width="160" height="40" rx="8" fill="#E8EEF7" stroke="#2C5C8F"/><text x="780" y="108" text-anchor="middle">App bureau/mobile</text>
+        <rect x="700" y="156" width="160" height="40" rx="8" fill="#E8EEF7" stroke="#2C5C8F"/><text x="780" y="181" text-anchor="middle">GitHub Actions</text>
+      </g>
+    </svg>
+  </div>
+  <div class="source">Source : GitHub Docs, « Copilot agents concepts » — docs.github.com/en/copilot/concepts/agents (consulté le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Dans quel environnement de cette liste travaillez-vous le plus ?</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Deux Copilot</div>
+  <h2 class="slide-title">Copilot Chat (M365) vs GitHub Copilot</h2>
+  <table class="ref">
+    <tr><th>Produit</th><th>Pour quoi faire</th><th>Voit votre code ?</th></tr>
+    <tr><td>Copilot Chat (M365)</td><td>Mail, résumé, Office</td><td>Non</td></tr>
+    <tr><td>GitHub Copilot</td><td>Code, tests, documentation, revue</td><td>Oui</td></tr>
+  </table>
+  <div class="source">Source : Microsoft Learn, « Decide which Copilot is right for you » (consulté le 08/07/2026).</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Gratuit vs payant</div>
+  <h2 class="slide-title">Ce qui est gratuit, ce qui coûte</h2>
+  <div class="two-col">
+    <div class="card"><h4>🟢 Gratuit, illimité</h4><p>Complétions de code et suggestions « next edit » pendant que vous tapez.</p></div>
+    <div class="card"><h4>🟡 Consomme des AI Credits</h4><p>Chat, Agent mode, Cloud agent, Copilot CLI, Copilot Spaces, Spark.</p></div>
+  </div>
+  <div class="source">Source : GitHub Docs, « Usage-based billing for individuals » — docs.github.com/en/copilot/concepts/billing/usage-based-billing-for-individuals (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-exercice">
+  <div class="exo-tag">⚡ Mini-quiz éclair</div>
+  <h2 class="exo-title">Fondamentaux — 3 questions</h2>
+  <ol class="exo-steps">
+    <li>Vrai ou faux : Copilot Chat M365 voit le code de vos dépôts.</li>
+    <li>Citez 2 environnements où GitHub Copilot est disponible, en dehors de VS Code.</li>
+    <li>Les complétions de code pendant que vous tapez sont-elles facturées ?</li>
+  </ol>
+  <div class="question"><b>❓</b> On répond à voix haute, qui commence ?</div>
+</section>
+
+<section class="slide slide-divider">
+  <div class="section-tag">Coûts &amp; sobriété</div>
+  <h1 class="section-title">Comment les coûts fonctionnent</h1>
+  <p class="section-sub">AI Credits, tokens, et comment payer moins pour la même qualité.</p>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Vocabulaire</div>
+  <h2 class="slide-title">C'est quoi, un token ?</h2>
+  <p class="para">Un <b>token</b> est l'unité de base que manipule un LLM comme ceux qui alimentent Copilot — vu au module précédent. C'est un petit morceau de texte, souvent un mot courant ou une partie de mot pour les termes plus rares ou le code (par exemple, <code>createTask</code> peut être découpé en plusieurs tokens). Le modèle ne « lit » et n'« écrit » jamais directement des phrases : il traite une suite de tokens, l'un après l'autre.</p>
+  <p class="para">En pratique, une question de 20 mots représente environ 25 à 30 tokens d'entrée, tandis qu'une réponse contenant du code peut facilement atteindre plusieurs centaines de tokens de sortie. C'est cette unité — pas le nombre de « questions » posées — qui détermine le coût réel d'un échange avec Copilot, comme nous allons le voir avec le modèle des AI Credits.</p>
+  <div class="question"><b>❓</b> À votre avis, un fichier de 300 lignes collé dans le chat représente combien de tokens, à la louche ?</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Le modèle</div>
+  <h2 class="slide-title">1 AI Credit = 0,01 $</h2>
+  <p class="para">Toute consommation de Copilot Chat, Agent mode, Cloud agent ou CLI est convertie en <b>AI Credits</b>, l'unité de facturation à l'usage de Copilot depuis 2026. Chaque credit vaut exactement 0,01 $, ce qui rend le coût d'une session directement traduisible en euros ou en dollars — un budget mensuel de 1 500 credits équivaut donc à 15 $ de consommation possible.</p>
+  <p class="para">Le coût final d'une demande dépend de deux facteurs combinés : le <b>modèle</b> choisi dans le sélecteur (un modèle léger coûte nettement moins cher qu'un modèle haut de gamme, à volume de tokens égal) et le nombre de <b>tokens</b> réellement échangés, en entrée comme en sortie. Une question simple posée à un modèle léger peut ainsi coûter une fraction de credit, alors qu'une session d'Agent mode qui modifie plusieurs fichiers en consommera bien davantage — d'où l'intérêt des réflexes de sobriété présentés dans les slides suivantes.</p>
+  <div class="source">Source : GitHub Docs, « Usage-based billing for individuals » — docs.github.com/en/copilot/concepts/billing/usage-based-billing-for-individuals (consulté le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Un « credit » à 0,01 $ vous semble-t-il abstrait ou parlant ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Fiche de référence</div>
+  <h2 class="slide-title">Plans individuels — credits inclus</h2>
+  <table class="ref">
+    <tr><th>Plan</th><th>Prix/mois</th><th>Credits de base</th><th>Flex</th><th>Total</th></tr>
+    <tr><td>Copilot Pro</td><td>10 $</td><td>1 000</td><td>500</td><td>1 500</td></tr>
+    <tr><td>Copilot Pro+</td><td>39 $</td><td>3 900</td><td>3 100</td><td>7 000</td></tr>
+    <tr><td>Copilot Max</td><td>100 $</td><td>10 000</td><td>10 000</td><td>20 000</td></tr>
+  </table>
+  <div class="note">Les credits « flex » varient selon les conditions de marché ; les credits « de base » sont fixes chaque mois.</div>
+  <div class="source">Source : GitHub Docs, « Usage-based billing for individuals » — docs.github.com/en/copilot/concepts/billing/usage-based-billing-for-individuals (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Fiche de référence</div>
+  <h2 class="slide-title">Plans organisation — mécanique proche</h2>
+  <ul class="points"><li>En Business/Enterprise, les credits sont souvent <b>mutualisés par utilisateur et par mois</b> plutôt qu'individuels, avec un budget d'équipe possible.</li><li>Les administrateurs peuvent définir des <b>budgets de dépassement</b> (overage) au niveau organisation ou entreprise.</li><li>Le principe reste identique : complétions gratuites, Chat/Agent facturés au token.</li></ul>
+  <div class="source">Source : GitHub Docs, « Budgets for usage-based billing » — docs.github.com/en/copilot/concepts/billing/budgets-for-usage-based-billing (consulté le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Savez-vous quel plan Copilot est actif chez Transactis ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Fiche de référence</div>
+  <h2 class="slide-title">Ce qui consomme un « request »</h2>
+  <table class="ref">
+    <tr><th>Fonctionnalité</th><th>Coût en requêtes premium</th></tr>
+    <tr><td>Chat / CLI / Spaces</td><td>1 requête par prompt, multipliée par le taux du modèle</td></tr>
+    <tr><td>Revue de code automatique</td><td>13 requêtes par revue</td></tr>
+    <tr><td>Spark</td><td>4 requêtes par prompt (taux fixe)</td></tr>
+    <tr><td>Cloud agent</td><td>1 requête par session + 1 par commentaire de pilotage</td></tr>
+  </table>
+  <div class="note">Les actions autonomes d'un agent (appels d'outils internes) ne comptent pas comme des requêtes supplémentaires.</div>
+  <div class="source">Source : GitHub Docs, « Copilot requests » — docs.github.com/en/copilot/concepts/billing/copilot-requests (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Comprendre le calcul</div>
+  <h2 class="slide-title">Tokens d'entrée vs tokens de sortie</h2>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg">
+      <text x="150" y="20" text-anchor="middle" font-family="Poppins" font-size="13" fill="#3c3c46">Tokens d'entrée</text>
+      <rect x="90" y="30" width="120" height="30" fill="#2C5C8F" rx="6"/>
+      <text x="550" y="20" text-anchor="middle" font-family="Poppins" font-size="13" fill="#3c3c46">Tokens de sortie</text>
+      <rect x="450" y="30" width="120" height="90" fill="#B23A3A" rx="6"/>
+      <text x="150" y="140" text-anchor="middle" font-family="Poppins" font-size="12" fill="#3c3c46">coût de base</text>
+      <text x="510" y="140" text-anchor="middle" font-family="Poppins" font-size="12" fill="#3c3c46">jusqu'à 5x plus cher</text>
+    </svg>
+  </div>
+  <ul class="points"><li>Les tokens de <b>sortie</b> (ce que Copilot écrit) coûtent nettement plus cher que les tokens d'<b>entrée</b> (ce que vous lui montrez).</li><li>Demander « code seulement, sans explication » sur une tâche répétitive réduit le coût de façon significative.</li></ul>
+  <div class="source">Source : GitHub Docs, « Usage-based billing for individuals » ; VS Code Blog, « Improving token efficiency » (consultés le 19/07 et 08/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Fiche de référence</div>
+  <h2 class="slide-title">Bonnes pratiques d'optimisation — 1/2</h2>
+  <ul class="points"><li><b>Ouvrez les fichiers pertinents</b>, fermez les fichiers inutiles dans l'éditeur.</li><li><b>Nettoyez l'historique</b> de conversation : supprimez les échanges inutiles, repartez à zéro sur un nouveau sujet.</li><li><b>Décomposez</b> une tâche complexe en plusieurs étapes simples plutôt qu'une seule demande énorme.</li><li><b>Formulez avec précision</b> : moins d'itérations = moins de tokens gaspillés.</li></ul>
+  <div class="source">Source : GitHub Docs, « Best practices for using GitHub Copilot » — docs.github.com/en/copilot/using-github-copilot/best-practices-for-using-github-copilot (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Fiche de référence</div>
+  <h2 class="slide-title">Bonnes pratiques d'optimisation — 2/2</h2>
+  <ul class="points"><li><b>Fournissez des exemples concrets</b> (entrée/sortie attendue) plutôt que de longues explications.</li><li><b>Restez sur le même modèle</b> dans une conversation : changer de modèle casse la mise en cache du contexte (donc plus cher).</li><li><b>Reformulez</b> si la réponse ne convient pas, au lieu d'empiler des questions correctrices.</li><li>Donnez votre avis (👍/👎, accepter/refuser) : cela améliore la pertinence future, sans coût additionnel.</li></ul>
+  <div class="source">Source : GitHub Docs, « Best practices for using GitHub Copilot » — docs.github.com/en/copilot/using-github-copilot/best-practices-for-using-github-copilot (consulté le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Laquelle de ces 8 pratiques allez-vous appliquer dès aujourd'hui sur TaskBoard ?</div>
+</section>
+
+<section class="slide slide-exercice">
+  <div class="exo-tag">⚙️ Exercice éclair</div>
+  <h2 class="exo-title">Estimer un coût</h2>
+  <ol class="exo-steps">
+    <li>Un modèle mini traite 2 000 tokens d'entrée + 500 de sortie. Un modèle haut de gamme peut coûter jusqu'à 20x plus par token.</li>
+    <li>Pourquoi une tâche répétitive (ex. renommer des variables) ne justifie-t-elle presque jamais le modèle le plus puissant ?</li>
+  </ol>
+  <div class="question"><b>❓</b> Sur TaskBoard, quelle tâche de l'exercice mériterait un modèle puissant, et laquelle non ?</div>
+</section>
+
+<section class="slide slide-divider">
+  <div class="section-tag">Fiche de référence</div>
+  <h1 class="section-title">Toutes les commandes</h1>
+  <p class="section-sub">Variables, participants, slash commands, raccourcis, modèles.</p>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Contexte</div>
+  <h2 class="slide-title"><code>#file</code> <code>#selection</code> <code>#codebase</code></h2>
+  <div class="codeblock">#file:index.html
+/explain</div>
+  <ul class="points"><li><code>#file</code> cible un fichier précis — le réflexe le plus rentable.</li><li><code>#selection</code> cible le texte sélectionné.</li><li><code>#codebase</code> cherche dans tout le projet — plus cher, à réserver aux questions transversales.</li></ul>
+  <div class="source">Source : GitHub Docs, « Chat cheat sheet » — docs.github.com/en/copilot/reference/chat-cheat-sheet (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Fiche de référence</div>
+  <h2 class="slide-title">Toutes les variables de contexte <code>#</code></h2>
+  <table class="ref">
+    <tr><th>Variable</th><th>Inclut</th></tr>
+    <tr><td><code>#file</code></td><td>Le fichier indiqué</td></tr>
+    <tr><td><code>#selection</code></td><td>Le texte sélectionné</td></tr>
+    <tr><td><code>#codebase</code></td><td>Une recherche dans tout le projet</td></tr>
+    <tr><td><code>#block</code></td><td>Le bloc de code courant</td></tr>
+    <tr><td><code>#class</code></td><td>La classe courante</td></tr>
+    <tr><td><code>#comment</code></td><td>Le commentaire courant</td></tr>
+    <tr><td><code>#function</code></td><td>La fonction/méthode courante</td></tr>
+    <tr><td><code>#line</code></td><td>La ligne courante</td></tr>
+    <tr><td><code>#path</code></td><td>Le chemin du fichier</td></tr>
+    <tr><td><code>#project</code></td><td>Le contexte du projet</td></tr>
+    <tr><td><code>#sym</code></td><td>Le symbole courant</td></tr>
+  </table>
+  <div class="source">Source : GitHub Docs, « Chat cheat sheet » — docs.github.com/en/copilot/reference/chat-cheat-sheet (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Exemples reproductibles</div>
+  <h2 class="slide-title">Les autres variables # : exemples à coller — 1/2</h2>
+  <p class="para">Placez le curseur au bon endroit avant de coller chaque prompt — ces variables dépendent de la position de votre curseur, contrairement à <code>#file</code>.</p>
+  <div class="codeblock">Curseur dans la règle .board de css/layout.css, puis :
+#block Explique ce que fait ce bloc de règles.</div>
+  <div class="codeblock">Curseur sur le sélecteur .card de css/components.css, puis :
+#class Dans quelles pages ce sélecteur est-il utilisé ?</div>
+  <div class="codeblock">Curseur sur le commentaire NOTE PEDAGOGIQUE de css/legacy-styles.css, puis :
+#comment Explique ce que ce commentaire demande de faire.</div>
+  <div class="codeblock">Curseur sur la ligne --color-accent de css/variables.css, puis :
+#line Où cette variable est-elle réutilisée dans le projet ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Exemples reproductibles</div>
+  <h2 class="slide-title">Les autres variables # : exemples à coller — 2/2</h2>
+  <div class="codeblock">Ouvrez about.html, puis :
+#path D'après ce chemin de fichier, à quoi sert cette page ?</div>
+  <div class="codeblock">N'importe quel fichier ouvert, puis :
+#project Résume l'organisation de ce projet en 3 lignes.</div>
+  <div class="codeblock">Curseur sur le symbole --color-accent dans css/variables.css, puis :
+#sym Liste les fichiers qui utilisent ce symbole.</div>
+  <div class="note"><code>#function</code> cible une fonction ou méthode — moins pertinent sur un projet 100% HTML/CSS sans logique de code. Vous le retrouverez tel quel sur tout projet avec du JavaScript, du Python, etc.</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Fiche de référence</div>
+  <h2 class="slide-title">Tous les participants de chat <code>@</code></h2>
+  <table class="ref">
+    <tr><th>Participant</th><th>Domaine</th></tr>
+    <tr><td><code>@workspace</code></td><td>Le code de votre espace de travail</td></tr>
+    <tr><td><code>@vscode</code></td><td>Commandes et fonctionnalités de VS Code</td></tr>
+    <tr><td><code>@terminal</code></td><td>Le terminal intégré</td></tr>
+    <tr><td><code>@github</code></td><td>Compétences GitHub (issues, PR)</td></tr>
+    <tr><td><code>@azure</code></td><td>Services Azure</td></tr>
+  </table>
+  <div class="note">Sur github.com : mentions génériques Discussions, Extensions, Files, Issues, Pull requests, Repositories.</div>
+  <div class="source">Source : GitHub Docs, « Chat cheat sheet » — docs.github.com/en/copilot/reference/chat-cheat-sheet (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Exemples reproductibles</div>
+  <h2 class="slide-title">Participants @ : exemples à coller — 1/2</h2>
+  <p class="para">Chaque participant oriente Copilot vers une source de connaissance précise. Voici 3 exemples que vous pourrez recoller tels quels cet après-midi sur TaskBoard.</p>
+  <div class="codeblock">@workspace Où est définie la classe TaskStore, et quels fichiers l'utilisent ?</div>
+  <div class="codeblock">@vscode Comment afficher le panneau des problèmes (Problems) dans cette fenêtre ?</div>
+  <div class="codeblock">@terminal Explique ce que fait la dernière commande que j'ai exécutée dans ce terminal.</div>
+  <div class="note"><code>@terminal</code> ne fonctionne que si un terminal intégré est ouvert et a déjà exécuté au moins une commande.</div>
+  <div class="question"><b>❓</b> Lequel de ces 3 participants avez-vous déjà croisé sans savoir qu'il portait un nom précis ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Exemples reproductibles</div>
+  <h2 class="slide-title">Participants @ : exemples à coller — 2/2</h2>
+  <p class="para"><code>@github</code> et <code>@azure</code> demandent un contexte externe (un dépôt GitHub réel connecté, ou un abonnement Azure) : voici néanmoins deux exemples à garder sous la main pour le jour où vous en aurez besoin.</p>
+  <div class="codeblock">@github Résume les issues ouvertes sur ce dépôt qui mentionnent "priorité".</div>
+  <div class="codeblock">@azure Je veux héberger un petit site HTML/CSS statique, quelle est la première étape ?</div>
+  <div class="note">Si vous n'avez pas ce contexte en salle, testez au moins <code>@workspace</code> et <code>@vscode</code> maintenant sur TaskBoard — ce sont les deux plus utiles au quotidien.</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Fiche de référence</div>
+  <h2 class="slide-title">Commandes slash — VS Code</h2>
+  <table class="ref">
+    <tr><th>Commande</th><th>Action</th></tr>
+    <tr><td><code>/explain</code></td><td>Explique le code de l'éditeur actif</td></tr>
+    <tr><td><code>/fix</code></td><td>Propose une correction</td></tr>
+    <tr><td><code>/fixTestFailure</code></td><td>Corrige un test qui échoue</td></tr>
+    <tr><td><code>/tests</code></td><td>Génère des tests unitaires</td></tr>
+    <tr><td><code>/new</code></td><td>Crée un nouveau projet</td></tr>
+    <tr><td><code>/clear</code></td><td>Nouvelle session</td></tr>
+    <tr><td><code>/help</code></td><td>Rappel des bases</td></tr>
+  </table>
+  <div class="source">Source : GitHub Docs, « Chat cheat sheet » — docs.github.com/en/copilot/reference/chat-cheat-sheet (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Exemples reproductibles</div>
+  <h2 class="slide-title">Commandes VS Code : exemples à coller — 1/2</h2>
+  <p class="para">Un exemple concret pour chaque commande, prêt à coller dans Copilot Chat sur TaskBoard.</p>
+  <div class="codeblock">#file:index.html
+/explain</div>
+  <div class="codeblock">#file:css/legacy-styles.css
+/fix
+Réécris ces règles avec les variables de css/variables.css, sans !important,
+en gardant EXACTEMENT le même rendu visuel.</div>
+  <div class="codeblock">#file:index.html
+/doc
+Ajoute un commentaire HTML au-dessus du formulaire, expliquant pourquoi
+il est volontairement statique.</div>
+  <div class="codeblock">/help</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Exemples reproductibles</div>
+  <h2 class="slide-title">Commandes VS Code : exemples à coller — 2/2</h2>
+  <div class="codeblock">/new
+Crée un squelette de nouvelle page HTML pour TaskBoard, avec la même
+structure que index.html (en-tête, navigation, main, pied de page).</div>
+  <div class="codeblock">/clear</div>
+  <div class="note"><code>/tests</code> et <code>/fixTestFailure</code> génèrent et corrigent des tests automatisés — utiles sur du code avec logique (JavaScript, Python...). Sur un projet 100% HTML/CSS comme TaskBoard, ils ne s'appliquent pas directement : c'est la checklist d'accessibilité (Étape 5 du guide d'exercice) qui joue ce rôle de vérification.</div>
+  <div class="question"><b>❓</b> Laquelle de ces 7 commandes n'avez-vous encore jamais utilisée ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Fiche de référence</div>
+  <h2 class="slide-title">Commandes slash — Visual Studio &amp; JetBrains</h2>
+  <table class="ref">
+    <tr><th>Éditeur</th><th>Commandes propres</th></tr>
+    <tr><td>Visual Studio</td><td><code>/doc</code> (documenter un symbole) · <code>/optimize</code> (améliorer le temps d'exécution)</td></tr>
+    <tr><td>JetBrains</td><td><code>/chronicle</code> (historique de session) · <code>/compact</code> (compresser le contexte CLI) · <code>/remote</code> (session CLI à distance)</td></tr>
+  </table>
+  <div class="note">Les deux éditeurs partagent aussi <code>/explain</code>, <code>/fix</code>, <code>/tests</code>, <code>/help</code>.</div>
+  <div class="source">Source : GitHub Docs, « Chat cheat sheet » — docs.github.com/en/copilot/reference/chat-cheat-sheet (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Exemples reproductibles</div>
+  <h2 class="slide-title">Visual Studio &amp; JetBrains : exemples à coller</h2>
+  <div class="codeblock">Sélectionnez la règle .card dans css/components.css, puis :
+/doc</div>
+  <div class="codeblock">Sélectionnez le sélecteur "div.card div.card-title.old" dans
+css/legacy-styles.css, puis :
+/optimize</div>
+  <div class="codeblock">/chronicle</div>
+  <div class="note">Si vous êtes sur VS Code aujourd'hui : lisez ces exemples, ils fonctionnent à l'identique le jour où vous ouvrirez Visual Studio ou un IDE JetBrains.</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Fiche de référence</div>
+  <h2 class="slide-title">Commandes slash — Xcode &amp; github.com</h2>
+  <table class="ref">
+    <tr><th>Environnement</th><th>Commandes propres</th></tr>
+    <tr><td>Xcode</td><td><code>/doc</code> · <code>/simplify</code> (simplifier la sélection) + communes</td></tr>
+    <tr><td>github.com</td><td><code>/new</code> · <code>/rename</code> · <code>/clear</code> · <code>/delete</code></td></tr>
+  </table>
+  <div class="source">Source : GitHub Docs, « Chat cheat sheet » — docs.github.com/en/copilot/reference/chat-cheat-sheet (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Exemples reproductibles</div>
+  <h2 class="slide-title">Xcode &amp; github.com : exemples à coller</h2>
+  <div class="codeblock">Sélectionnez la section &lt;section class="board"&gt; dans index.html, puis :
+/simplify</div>
+  <p class="para">Sur github.com, dans une conversation Copilot existante :</p>
+  <div class="codeblock">/rename
+Exercice TaskBoard — 19 juillet</div>
+  <div class="codeblock">/new</div>
+  <div class="note"><code>/clear</code> et <code>/delete</code> ne prennent pas de texte : ce sont des boutons/commandes d'action directe dans l'interface de conversation.</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Fiche de référence</div>
+  <h2 class="slide-title">Copilot dans le terminal (CLI)</h2>
+  <div class="codeblock">$ copilot
+&gt; explique les règles du fichier css/legacy-styles.css</div>
+  <ul class="points"><li>Copilot CLI apporte le Chat directement dans le terminal, hors éditeur.</li><li>Utile pour des tâches shell/scripts, ou quand aucun IDE n'est ouvert.</li><li>Partage les commandes <code>/compact</code> et <code>/remote</code> vues côté JetBrains.</li></ul>
+  <div class="source">Source : GitHub Docs, « Copilot agents concepts » — docs.github.com/en/copilot/concepts/agents (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Fiche de référence</div>
+  <h2 class="slide-title">Compétences MCP sur github.com</h2>
+  <table class="ref">
+    <tr><th>Compétence</th><th>Action</th></tr>
+    <tr><td><code>get_me</code></td><td>Vos infos utilisateur</td></tr>
+    <tr><td><code>search_users</code></td><td>Recherche d'utilisateurs</td></tr>
+    <tr><td><code>create_branch</code></td><td>Créer une branche</td></tr>
+    <tr><td><code>create_or_update_file</code></td><td>Ajouter/modifier un fichier</td></tr>
+    <tr><td><code>push_files</code></td><td>Pousser des fichiers</td></tr>
+    <tr><td><code>update_pull_request_branch</code></td><td>Mettre à jour une PR</td></tr>
+    <tr><td><code>merge_pull_request</code></td><td>Fusionner une PR</td></tr>
+  </table>
+  <div class="source">Source : GitHub Docs, « Chat cheat sheet » — docs.github.com/en/copilot/reference/chat-cheat-sheet (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Fiche de référence</div>
+  <h2 class="slide-title">Raccourcis clavier — toutes plateformes</h2>
+  <table class="ref">
+    <tr><th>Action</th><th>Win/Linux</th><th>Mac</th></tr>
+    <tr><td>Accepter</td><td><code>Tab</code></td><td><code>Option+Tab</code></td></tr>
+    <tr><td>Ignorer</td><td><code>Échap</code></td><td><code>Échap</code></td></tr>
+    <tr><td>Suivante</td><td><code>Alt+]</code></td><td><code>Option+]</code></td></tr>
+    <tr><td>Précédente</td><td><code>Alt+[</code></td><td><code>Option+[</code></td></tr>
+    <tr><td>Déclencher</td><td><code>Alt+\</code></td><td><code>Option+\</code></td></tr>
+    <tr><td>Panneau Copilot</td><td><code>Ctrl+Entrée</code></td><td><code>Ctrl+Retour</code></td></tr>
+  </table>
+  <div class="source">Source : GitHub Docs, « Keyboard shortcuts for GitHub Copilot in the IDE » — docs.github.com/en/copilot/reference/keyboard-shortcuts (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Fiche de référence</div>
+  <h2 class="slide-title">Tous les modèles disponibles</h2>
+  <table class="ref">
+    <tr><th>Fournisseur</th><th>Modèles</th></tr>
+    <tr><td>OpenAI</td><td>GPT-5 mini · 5.3-Codex · 5.4 (+mini/nano) · 5.5 · 5.6 Luna/Sol/Terra</td></tr>
+    <tr><td>Anthropic</td><td>Haiku 4.5 · Sonnet 4.5/4.6/5 · Opus 4.5/4.6/4.7/4.8 · Fable 5</td></tr>
+    <tr><td>Google</td><td>Gemini 2.5 Pro · 3 Flash · 3.1 Pro · 3.5 Flash</td></tr>
+    <tr><td>Microsoft / autres</td><td>MAI-Code-1-Flash · Raptor mini · Kimi K2.7 Code</td></tr>
+  </table>
+  <div class="source">Source : GitHub Docs, « Supported AI models in Copilot » — docs.github.com/en/copilot/reference/ai-models/supported-models (consulté le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Un modèle « mini » suffit-il pour expliquer <code>css/base.css</code> de TaskBoard ?</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Choisir simplement</div>
+  <h2 class="slide-title">Changer de modèle, pas à pas</h2>
+  <ol class="exo-steps">
+    <li>Ouvrez Copilot Chat.</li>
+    <li>Cliquez sur le nom du modèle en bas de la fenêtre.</li>
+    <li>Choisissez un autre modèle dans la liste.</li>
+    <li>Le nouveau modèle s'applique dès le prochain message.</li>
+  </ol>
+  <div class="note">Réflexe débutant : gardez le modèle par défaut pour vos premières questions.</div>
+</section>
+
+<section class="slide slide-exercice">
+  <div class="exo-tag">⚙️ Exercice éclair</div>
+  <h2 class="exo-title">Comparer 2 modèles</h2>
+  <div class="codeblock">#file:css/legacy-styles.css
+/explain
+Liste les problèmes de ce fichier CSS en 3 points maximum.</div>
+  <ol class="exo-steps">
+    <li>Collez ce prompt tel quel, une première fois avec un modèle « mini » sélectionné, puis une seconde fois dans une nouvelle conversation avec un modèle plus complet.</li>
+    <li>Comparez : longueur de la réponse, pertinence, temps perçu.</li>
+  </ol>
+  <div class="question"><b>❓</b> Le modèle le plus puissant a-t-il vraiment donné une meilleure réponse pour cette tâche simple ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Récap pratique</div>
+  <h2 class="slide-title">Grille de décision : quel outil, pour quelle tâche ?</h2>
+  <table class="ref">
+    <tr><th>Besoin</th><th>Outil recommandé</th></tr>
+    <tr><td>Comprendre un fichier</td><td>Chat + <code>#file</code> + <code>/explain</code></td></tr>
+    <tr><td>Corriger un bug ciblé</td><td>Chat + <code>#selection</code> + <code>/fix</code></td></tr>
+    <tr><td>Modifier plusieurs fichiers, sous contrôle</td><td>Agent mode</td></tr>
+    <tr><td>Tâche longue, déléguée</td><td>Cloud agent</td></tr>
+    <tr><td>Automatiser une tâche récurrente</td><td>Workflow agentique (<code>on: daily</code>)</td></tr>
+    <tr><td>Rédiger un mail ou un compte-rendu</td><td>Copilot Chat (M365), pas GitHub Copilot</td></tr>
+  </table>
+  <div class="question"><b>❓</b> Laquelle de ces 6 lignes correspond le mieux à votre prochaine tâche réelle ?</div>
+</section>
+
+<section class="slide slide-divider">
+  <div class="section-tag">Écosystème avancé</div>
+  <h1 class="section-title">Agents, MCP, skills, hooks, plugins, workflows</h1>
+  <p class="section-sub">Tout ce qui existe aujourd'hui, expliqué simplement.</p>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Agent mode</div>
+  <h2 class="slide-title">Agent mode : un collègue à côté de vous</h2>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 120" xmlns="http://www.w3.org/2000/svg">
+      <rect x="20" y="35" width="140" height="50" rx="8" fill="#E8EEF7" stroke="#2C5C8F"/><text x="90" y="65" text-anchor="middle" font-family="Poppins" font-size="12" fill="#2C5C8F">Votre demande</text>
+      <path d="M170 60 L260 60" stroke="#B9862E" stroke-width="2" marker-end="url(#arrow)"/>
+      <rect x="270" y="35" width="160" height="50" rx="8" fill="#1B3A5C"/><text x="350" y="65" text-anchor="middle" font-family="Poppins" font-size="12" fill="#fff">Agent mode (IDE)</text>
+      <path d="M440 60 L530 60" stroke="#B9862E" stroke-width="2" marker-end="url(#arrow)"/>
+      <rect x="540" y="35" width="140" height="50" rx="8" fill="#E6F4EA"/><text x="610" y="58" text-anchor="middle" font-family="Poppins" font-size="11" fill="#1E7A46">Vous validez</text><text x="610" y="72" text-anchor="middle" font-family="Poppins" font-size="11" fill="#1E7A46">étape par étape</text>
+      <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#B9862E"/></marker></defs>
+    </svg>
+  </div>
+  <p class="para">L'Agent mode transforme Copilot d'un simple assistant qui répond en un collaborateur qui <b>agit</b> : il peut lire plusieurs fichiers à la fois, proposer des modifications sur chacun d'eux, et exécuter des commandes dans le terminal. C'est le mode à privilégier dès qu'une tâche dépasse un seul fichier — par exemple, ajouter une nouvelle section à <code>index.html</code> et son style associé dans <code>css/components.css</code> en une seule demande.</p>
+  <p class="para">La différence essentielle avec un simple Chat, c'est que vous restez <b>en direct, à côté de l'agent</b> : chaque modification proposée s'affiche avant d'être appliquée, vous pouvez interrompre à tout moment, et rien n'est écrit sur disque sans votre validation explicite.</p>
+  <div class="source">Source : GitHub Blog, « The difference between coding agent and agent mode » (consulté le 08/07/2026).</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Cloud agent</div>
+  <h2 class="slide-title">Cloud agent : un collègue parti travailler seul</h2>
+  <p class="para">Le Cloud agent (parfois encore appelé « Coding agent ») pousse la délégation plus loin : au lieu de rester à côté de vous, il part travailler seul, de façon asynchrone, et revient plus tard avec un résultat complet à relire. Son fonctionnement suit toujours trois étapes explicites : il commence par une phase de <b>recherche</b> dans le dépôt pour comprendre le contexte, puis propose un <b>plan</b> d'implémentation avant d'écrire la moindre ligne, et enfin réalise les <b>modifications</b> sur une branche dédiée.</p>
+  <p class="para">Une fois son travail terminé, c'est à vous de relire le résultat et de préparer la pull request — la revue humaine reste une étape obligatoire, jamais automatique. Le Cloud agent peut également s'appuyer sur des agents personnalisés, des automatisations planifiées (voir les workflows plus loin), et des connexions MCP pour élargir son champ d'action.</p>
+  <div class="source">Source : GitHub Docs, « About the Copilot cloud agent » — docs.github.com/en/copilot/concepts/agents/cloud-agent (consulté le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Confieriez-vous « ajouter un formulaire complet avec validation » à un agent qui travaille seul ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Agents personnalisés</div>
+  <h2 class="slide-title"><code>*.agent.md</code> : où les stocker ?</h2>
+  <p class="para">Un agent personnalisé peut être stocké à <b>deux niveaux</b>, et cette différence compte. Au niveau du <b>projet</b>, dans le dossier <code>.github/agents/</code> (ou <code>.claude/agents/</code> pour le format Claude) : l'agent est versionné avec le code, partagé avec toute l'équipe dès qu'il est commité, et ne s'applique qu'à ce dépôt. Au niveau <b>utilisateur</b>, dans <code>~/.copilot/agents/</code> (votre profil VS Code) : l'agent vous est personnel, disponible sur tous vos projets, mais invisible pour vos collègues.</p>
+  <p class="para">Règle simple : un agent qui encode une convention d'équipe (comme notre <code>reviewer</code> pour TaskBoard) va dans le projet ; un agent qui reflète vos habitudes personnelles va dans votre profil utilisateur.</p>
+  <div class="source">Source : VS Code Docs, « Custom agents » — code.visualstudio.com/docs/copilot/customization/custom-agents (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Agents personnalisés</div>
+  <h2 class="slide-title"><code>*.agent.md</code> : créer l'agent, étape par étape</h2>
+  <ol class="exo-steps">
+    <li>Dans la vue Chat, cliquez sur l'icône ⚙️ « Configure Chat », onglet <b>Agents</b>.</li>
+    <li>Choisissez « New Agent (Workspace) » pour un agent de projet (ou « New Agent (User) » pour votre profil).</li>
+    <li>Nommez le fichier — ce sera aussi le nom affiché dans la liste des agents.</li>
+    <li>Collez le contenu ci-dessous, propre à TaskBoard :</li>
+  </ol>
+  <div class="codeblock">.github/agents/reviewer.agent.md
+
+---
+name: reviewer
+description: Analyse uniquement le code de TaskBoard, ne modifie jamais rien
+tools: [read, search]
+---
+Tu es un agent de revue de code pour TaskBoard. Tu ne dois JAMAIS
+proposer de modification directe des fichiers. Ta sortie est toujours
+structurée : constat, risque, recommandation.</div>
+  <div class="source">Source : VS Code Docs, « Custom agents » — code.visualstudio.com/docs/copilot/customization/custom-agents (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-exercice">
+  <div class="exo-tag">⚙️ Exercice éclair</div>
+  <h2 class="exo-title">Tester l'agent reviewer</h2>
+  <ol class="exo-steps">
+    <li>Ouvrez le menu déroulant des agents dans la fenêtre de chat, sélectionnez <code>reviewer</code>.</li>
+    <li>Collez le prompt ci-dessous et vérifiez qu'aucun fichier n'est modifié :</li>
+  </ol>
+  <div class="codeblock">#file:index.html
+Analyse ce fichier et signale les risques éventuels.</div>
+  <div class="question"><b>❓</b> L'agent a-t-il respecté son périmètre déclaré (analyse seule, aucune modification) ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Sous-agents</div>
+  <h2 class="slide-title">Le mécanisme des sous-agents : <code>handoffs</code></h2>
+  <p class="para">Un agent personnalisé peut <b>déléguer</b> à un autre agent grâce au champ <code>handoffs</code> de son en-tête : un bouton apparaît dans le chat, avec un texte au choix, qui bascule la conversation vers l'agent cible en lui transmettant un prompt suggéré. Un agent peut aussi lister, via le champ <code>agents</code>, les sous-agents qu'il a le droit d'invoquer lui-même. C'est exactement le principe évoqué plus tôt dans ce support : un agent « planificateur » restreint, qui transmet ensuite la main à un agent « relecteur » lui aussi restreint.</p>
+  <div class="source">Source : VS Code Docs, « Custom agents » (champs <code>handoffs</code>, <code>agents</code>) — code.visualstudio.com/docs/copilot/customization/custom-agents (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Sous-agents</div>
+  <h2 class="slide-title">Exemple applicable : planner → reviewer sur TaskBoard</h2>
+  <p class="para">Créez un second agent <code>.github/agents/planner.agent.md</code>, qui ne produit jamais de code, seulement un plan — puis transmet la main à <code>reviewer</code> (créé juste avant) pour validation :</p>
+  <div class="codeblock">---
+name: planner
+description: Planifie une évolution de TaskBoard, sans écrire de code
+tools: [read, search]
+handoffs:
+  - label: Envoyer au relecteur
+    agent: reviewer
+    prompt: Relis ce plan et signale les risques avant toute implémentation
+    send: false
+---
+Tu proposes uniquement un plan d'implémentation en 3 à 5 étapes,
+jamais de code. Termine toujours en proposant l'envoi au relecteur.</div>
+  <div class="codeblock">Sélectionnez l'agent planner, puis collez :
+Je veux ajouter un filtre par priorité sur le tableau TaskBoard. Propose un plan.</div>
+  <div class="question"><b>❓</b> Cliquez sur le bouton de handoff : le relecteur reçoit-il bien le plan complet ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Skills</div>
+  <h2 class="slide-title">Skills : des compétences réutilisables</h2>
+  <p class="para">Une <b>skill</b> est un dossier autonome (<code>skills/nom-de-la-skill/SKILL.md</code>) qui décrit, en langage naturel, une compétence complète que Copilot peut mobiliser : quand l'utiliser, comment procéder étape par étape, et quels résultats produire. Contrairement à un simple prompt file, une skill peut embarquer des fichiers annexes au même endroit — gabarits, scripts, exemples — pour former un ensemble cohérent et directement réutilisable.</p>
+  <p class="para">L'intérêt principal est la <b>capitalisation</b> : plutôt que de réexpliquer chaque fois « comment on fait une revue de code chez nous » dans le chat, on documente la compétence une seule fois, et toute l'équipe peut s'appuyer dessus de façon identique.</p>
+  <div class="source">Source : GitHub Docs, « About plugins » — docs.github.com/en/copilot/concepts/agents/about-plugins (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Skills</div>
+  <h2 class="slide-title">Créer une skill pour TaskBoard, étape par étape</h2>
+  <ol class="exo-steps">
+    <li>Dans <code>codebase_taskboard/</code>, créez le dossier <code>skills/validation-taskboard/</code>.</li>
+    <li>À l'intérieur, créez le fichier <code>SKILL.md</code> avec le contenu ci-dessous.</li>
+    <li>Enregistrez : aucune activation supplémentaire n'est nécessaire.</li>
+  </ol>
+  <div class="codeblock">skills/validation-taskboard/SKILL.md
+
+# Validation TaskBoard
+
+Quand l'utiliser : avant d'ajouter un élément à une page (carte, champ
+de formulaire, badge), pour vérifier la cohérence avec le reste du
+projet.
+
+Comment procéder :
+1. Vérifier que toute couleur ou espacement utilisé provient de
+   css/variables.css — jamais de valeur écrite en dur.
+2. Vérifier que chaque nouveau champ de formulaire a un &lt;label&gt;
+   associé (voir docs/checklist-accessibilite.md).
+3. Rejeter toute proposition qui introduit du JavaScript : ce projet
+   reste volontairement HTML/CSS uniquement.</div>
+  <div class="source">Source : GitHub Docs, « About plugins » — docs.github.com/en/copilot/concepts/agents/about-plugins (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-exercice">
+  <div class="exo-tag">⚙️ Exercice éclair</div>
+  <h2 class="exo-title">Tester la skill</h2>
+  <ol class="exo-steps">
+    <li>Dans le chat, mentionnez le fichier de la skill pour la mettre en contexte, puis posez une demande qui devrait la déclencher :</li>
+  </ol>
+  <div class="codeblock">#file:skills/validation-taskboard/SKILL.md
+Je veux ajouter un champ "tags" (liste de mots-clés) au formulaire de
+index.html. Applique la procédure de validation-taskboard avant de proposer du HTML/CSS.</div>
+  <div class="question"><b>❓</b> La réponse a-t-elle bien suivi les 3 étapes décrites dans la skill ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Plugins</div>
+  <h2 class="slide-title">Plugins : regrouper agents, skills, hooks, MCP</h2>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="250" y="10" width="200" height="36" rx="8" fill="#1B3A5C"/><text x="350" y="33" text-anchor="middle" fill="#fff" font-family="Poppins" font-size="13">plugin.json</text>
+      <g stroke="#B9862E" stroke-width="2"><line x1="300" y1="46" x2="100" y2="100"/><line x1="330" y1="46" x2="260" y2="100"/><line x1="370" y1="46" x2="440" y2="100"/><line x1="400" y1="46" x2="600" y2="100"/></g>
+      <g font-family="Poppins" font-size="11" fill="#2C5C8F">
+        <rect x="30" y="100" width="140" height="40" rx="6" fill="#E8EEF7" stroke="#2C5C8F"/><text x="100" y="124" text-anchor="middle">agents/</text>
+        <rect x="190" y="100" width="140" height="40" rx="6" fill="#E8EEF7" stroke="#2C5C8F"/><text x="260" y="124" text-anchor="middle">skills/</text>
+        <rect x="370" y="100" width="140" height="40" rx="6" fill="#E8EEF7" stroke="#2C5C8F"/><text x="440" y="124" text-anchor="middle">hooks.json</text>
+        <rect x="530" y="100" width="140" height="40" rx="6" fill="#E8EEF7" stroke="#2C5C8F"/><text x="600" y="124" text-anchor="middle">.mcp.json</text>
+      </g>
+    </svg>
+  </div>
+  <p class="para">Un <b>plugin</b> est un paquet installable qui distribue, en une seule fois, un ensemble cohérent de bonnes pratiques Copilot à toute une équipe : des agents personnalisés, des skills, des hooks et des connexions MCP, réunis autour d'un fichier <code>plugin.json</code> qui décrit le tout. C'est la brique d'industrialisation la plus aboutie de l'écosystème : au lieu de copier des fichiers un par un entre projets, on installe un plugin entier.</p>
+  <div class="source">Source : GitHub Docs, « About plugins » ; github.com/github/awesome-copilot (consultés le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Plugins</div>
+  <h2 class="slide-title">Installer un plugin, étape par étape</h2>
+  <ol class="exo-steps">
+    <li>Ouvrez un terminal (ou Copilot CLI) à la racine de votre projet.</li>
+    <li>Parcourez le catalogue awesome-copilot pour repérer un plugin utile (ex. un plugin de revue de code standard).</li>
+    <li>Installez-le avec la commande ci-dessous, en remplaçant <code>&lt;nom&gt;</code> par le nom exact du plugin :</li>
+  </ol>
+  <div class="codeblock">copilot plugin install &lt;nom&gt;@awesome-copilot</div>
+  <ol class="exo-steps" start="4">
+    <li>Vérifiez l'installation : les nouveaux agents, skills et prompt files du plugin apparaissent dans les menus correspondants de votre éditeur.</li>
+    <li>Testez un des composants installés sur TaskBoard, comme vous l'avez fait pour <code>reviewer</code>.</li>
+  </ol>
+  <div class="source">Source : GitHub Docs, « About plugins » ; github.com/github/awesome-copilot (consultés le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Un plugin installé une fois est-il valable pour tous vos projets, ou seulement celui-ci ? À vérifier ensemble.</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Hooks</div>
+  <h2 class="slide-title">Hooks : automatiser des actions</h2>
+  <p class="para">Un <b>hook</b>, déclaré dans un fichier <code>hooks.json</code>, déclenche automatiquement une action à un moment précis du cycle de travail de Copilot — par exemple juste avant ou juste après une modification de fichier. C'est un mécanisme d'automatisation fine, qui fait partie des composants qu'un plugin peut regrouper aux côtés des agents et des skills, pour imposer par exemple une vérification systématique avant chaque changement.</p>
+  <div class="source">Source : GitHub Docs, « About plugins » — docs.github.com/en/copilot/concepts/agents/about-plugins (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Hooks</div>
+  <h2 class="slide-title">Créer un hook pour TaskBoard, étape par étape</h2>
+  <ol class="exo-steps">
+    <li>À la racine de <code>codebase_taskboard/</code>, créez le fichier <code>hooks.json</code>.</li>
+    <li>Déclarez un hook qui rappelle de vérifier l'accessibilité après toute modification d'un fichier HTML :</li>
+  </ol>
+  <div class="codeblock">hooks.json
+
+{
+  "hooks": [
+    {
+      "event": "afterEdit",
+      "match": "*.html",
+      "action": "notify",
+      "message": "Page HTML modifiée — repassez docs/checklist-accessibilite.md avant de continuer."
+    }
+  ]
+}</div>
+  <ol class="exo-steps" start="3">
+    <li>Enregistrez, puis modifiez n'importe quelle page HTML pour vérifier que le rappel apparaît.</li>
+  </ol>
+  <div class="note">Le format exact des hooks dépend de l'outil qui les exécute (plugin, CLI) — l'exemple ci-dessus illustre le principe : un événement, une condition, une action.</div>
+  <div class="source">Source : GitHub Docs, « About plugins » — docs.github.com/en/copilot/concepts/agents/about-plugins (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">MCP</div>
+  <h2 class="slide-title">MCP : connecter Copilot à vos outils</h2>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 130" xmlns="http://www.w3.org/2000/svg">
+      <rect x="20" y="40" width="140" height="50" rx="8" fill="#1B3A5C"/><text x="90" y="70" text-anchor="middle" fill="#fff" font-family="Poppins" font-size="12">Copilot</text>
+      <path d="M170 65 L260 65" stroke="#B9862E" stroke-width="2" marker-end="url(#a2)"/>
+      <rect x="270" y="40" width="160" height="50" rx="8" fill="#E8EEF7" stroke="#2C5C8F"/><text x="350" y="70" text-anchor="middle" font-family="Poppins" font-size="12" fill="#2C5C8F">Serveur MCP</text>
+      <path d="M440 65 L530 65" stroke="#B9862E" stroke-width="2" marker-end="url(#a2)"/>
+      <rect x="540" y="20" width="140" height="30" rx="6" fill="#EAF6EE"/><text x="610" y="40" text-anchor="middle" font-family="Poppins" font-size="10" fill="#1E7A46">API interne</text>
+      <rect x="540" y="55" width="140" height="30" rx="6" fill="#EAF6EE"/><text x="610" y="75" text-anchor="middle" font-family="Poppins" font-size="10" fill="#1E7A46">Base de données</text>
+      <rect x="540" y="90" width="140" height="30" rx="6" fill="#EAF6EE"/><text x="610" y="110" text-anchor="middle" font-family="Poppins" font-size="10" fill="#1E7A46">Outil projet</text>
+      <defs><marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#B9862E"/></marker></defs>
+    </svg>
+  </div>
+  <p class="para">Le <b>Model Context Protocol (MCP)</b> est un standard ouvert qui définit comment Copilot peut se connecter à des outils et des données situés en dehors de votre code : une API interne, une base de données, un outil de gestion de projet. Plutôt que d'accorder un accès global, MCP fonctionne par <b>toolsets</b> — des regroupements de fonctionnalités que vous activez un par un, explicitement, ce qui permet de garder un contrôle fin sur ce que l'IA a le droit de faire.</p>
+  <div class="source">Source : GitHub Docs, « Model Context Protocol (MCP) » — docs.github.com/en/copilot/concepts/context/mcp (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">MCP</div>
+  <h2 class="slide-title">MCP : gouvernance et sécurité</h2>
+  <p class="para">Précisément parce qu'il ouvre Copilot vers l'extérieur, MCP est <b>désactivé par défaut</b> au niveau d'une organisation, via une politique dédiée (« MCP servers in Copilot ») réservée aux abonnements Business et Enterprise. Son activation se fait toolset par toolset, en suivant le principe du <b>moindre privilège</b> : on n'active que le strict nécessaire à la tâche, jamais « au cas où ».</p>
+  <p class="para">Pour les dépôts protégés par GitHub Advanced Security, un filet de sécurité supplémentaire existe : la <i>push protection</i> bloque automatiquement les secrets détectés dans une réponse générée par l'IA, avant qu'ils ne soient publiés.</p>
+  <div class="source">Source : GitHub Docs, « Model Context Protocol (MCP) » — docs.github.com/en/copilot/concepts/context/mcp (consulté le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Qui, chez Transactis, devrait valider l'activation d'un nouveau serveur MCP ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">MCP en pratique</div>
+  <h2 class="slide-title">Exemple concret : le serveur MCP Context7</h2>
+  <p class="para"><b>Context7</b> est un serveur MCP très utilisé qui résout un problème précis : un LLM (voir le module « Comprendre l'IA ») est entraîné sur une photo figée du monde à un instant donné — il connaît donc souvent une <b>ancienne version</b> d'une bibliothèque, et peut halluciner des fonctions qui n'existent plus ou pas encore. Context7 va chercher, au moment même de votre question, la documentation à jour de la bibliothèque concernée, directement depuis sa source, et la fournit à Copilot avant qu'il ne réponde.</p>
+  <p class="para">Concrètement : au lieu de générer du code basé sur une version d'il y a un an, Copilot vérifie d'abord la documentation actuelle — utile par exemple si TaskBoard adoptait un jour un vrai framework CSS (Bootstrap, Tailwind CSS) plutôt que du CSS pur écrit à la main.</p>
+  <div class="source">Source : github.com/upstash/context7 (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">MCP en pratique</div>
+  <h2 class="slide-title">Installer Context7, étape par étape</h2>
+  <ol class="exo-steps">
+    <li>Créez une clé API gratuite sur context7.com/dashboard (recommandé, augmente les limites d'usage).</li>
+    <li>À la racine de votre projet, créez le fichier <code>.vscode/mcp.json</code> s'il n'existe pas déjà.</li>
+    <li>Ajoutez la configuration ci-dessous, avec votre clé :</li>
+  </ol>
+  <div class="codeblock">.vscode/mcp.json
+
+{
+  "servers": {
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": { "CONTEXT7_API_KEY": "votre-clé-ici" }
+    }
+  }
+}</div>
+  <ol class="exo-steps" start="4">
+    <li>Rechargez la fenêtre. Vérifiez la connexion via la Command Palette : « MCP: List Servers ».</li>
+  </ol>
+  <div class="note">Alternative rapide en ligne de commande, sans éditer de fichier à la main : <code>npx ctx7 setup</code>, puis suivez l'authentification proposée.</div>
+  <div class="source">Source : github.com/upstash/context7 (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-exercice">
+  <div class="exo-tag">⚙️ Exercice éclair</div>
+  <h2 class="exo-title">Utiliser Context7</h2>
+  <div class="codeblock">Quelles sont les classes utilitaires actuelles de Tailwind CSS pour
+créer une grille à 3 colonnes ? use context7</div>
+  <div class="note">Le mot-clé <code>use context7</code> à la fin d'un prompt indique explicitement à Copilot d'aller chercher la documentation à jour avant de répondre.</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Où trouver...</div>
+  <h2 class="slide-title">Trouver des MCP, skills et agents en ligne</h2>
+  <table class="ref">
+    <tr><th>Ressource</th><th>Contenu</th></tr>
+    <tr><td>github.com/mcp</td><td>Registre officiel : plus de 150 serveurs MCP, recherche, bouton d'installation</td></tr>
+    <tr><td>Extensions VS Code, recherche <code>@mcp</code></td><td>Galerie de serveurs MCP installables directement depuis l'éditeur</td></tr>
+    <tr><td>github.com/github/awesome-copilot</td><td>Agents, skills, instructions et plugins communautaires, catégorisés par dossier</td></tr>
+    <tr><td>context7.com</td><td>Documentation à jour de milliers de bibliothèques, via le serveur MCP Context7</td></tr>
+  </table>
+  <div class="source">Source : github.com/mcp ; VS Code Docs, « MCP servers » — code.visualstudio.com/docs/copilot/customization/mcp-servers ; github.com/github/awesome-copilot (consultés le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Parcourez github.com/mcp une minute : quel serveur pourrait servir à un projet Transactis réel ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Workflows</div>
+  <h2 class="slide-title">Agentic Workflows : automatiser en langage naturel</h2>
+  <p class="para">Les <b>workflows agentiques</b> sont des automatisations de dépôt écrites en langage naturel plutôt qu'en script rigide : un fichier Markdown combine un en-tête YAML (qui définit le déclencheur et les permissions accordées) avec des instructions en français ou en anglais courant, que l'agent interprète à chaque exécution. Ce fichier est ensuite compilé en un fichier <code>.lock.yml</code> GitHub Actions « durci », puis exécuté comme n'importe quel workflow classique du dépôt.</p>
+  <p class="para">Plusieurs moteurs peuvent exécuter ces workflows — <code>copilot</code>, mais aussi Claude, Codex ou Gemini selon le champ <code>engine</code> choisi — ce qui laisse la possibilité de comparer plusieurs IA sur la même automatisation.</p>
+  <div class="codeblock">---
+on: daily
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+engine: copilot
+---
+Chaque jour, résume les issues ouvertes depuis 24h et poste un
+commentaire de synthèse sur l'issue de suivi #42.</div>
+  <div class="source">Source : GitHub Docs, « About GitHub agentic workflows » — docs.github.com/en/copilot/concepts/agents/about-github-agentic-workflows (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Workflows</div>
+  <h2 class="slide-title">Ce qui est possible avec un workflow agentique</h2>
+  <div class="two-col">
+    <div class="card"><h4>Rapports</h4><p>Résumé quotidien de l'activité, synthèse des PR en attente, état d'avancement d'un projet.</p></div>
+    <div class="card"><h4>Triage</h4><p>Classer automatiquement les nouvelles issues par priorité ou par type.</p></div>
+    <div class="card"><h4>Veille technique</h4><p>Surveiller une dépendance et signaler une mise à jour importante.</p></div>
+    <div class="card"><h4>Maintenance</h4><p>Proposer une pull request de nettoyage régulier (dépendances, code mort).</p></div>
+  </div>
+  <p class="para">La limite n'est pas technique mais organisationnelle : un workflow agentique a accès uniquement aux permissions explicitement listées dans son en-tête (<code>contents</code>, <code>issues</code>, <code>pull-requests</code>...), suivant le même principe du moindre privilège que MCP.</p>
+  <div class="source">Source : GitHub Docs, « About GitHub agentic workflows » — docs.github.com/en/copilot/concepts/agents/about-github-agentic-workflows (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Workflows</div>
+  <h2 class="slide-title">Créer un workflow, étape par étape</h2>
+  <ol class="exo-steps">
+    <li>Dans <code>codebase_taskboard/</code>, créez le dossier <code>.github/workflows/</code> s'il n'existe pas.</li>
+    <li>Créez le fichier <code>weekly-todo-report.md</code> avec le contenu ci-dessous.</li>
+    <li>Commitez-le sur la branche par défaut : GitHub compile automatiquement un fichier <code>.lock.yml</code> associé.</li>
+    <li>Le workflow s'exécute ensuite seul, selon le déclencheur défini — ici chaque semaine.</li>
+  </ol>
+  <div class="codeblock">.github/workflows/weekly-todo-report.md
+
+---
+on: weekly
+permissions:
+  contents: read
+engine: copilot
+---
+Chaque semaine, relis data/seed.json et le contenu des tâches
+TaskBoard restées au statut "todo" depuis plus de 7 jours, et
+rédige une note de relance résumant ces tâches.</div>
+  <div class="note">Ce fichier peut aussi être écrit avec l'aide de Copilot lui-même : décrivez votre besoin en langage naturel, et demandez-lui de générer l'en-tête YAML correspondant.</div>
+  <div class="source">Source : GitHub Docs, « About GitHub agentic workflows » — docs.github.com/en/copilot/concepts/agents/about-github-agentic-workflows (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Loops</div>
+  <h2 class="slide-title">Loops : exécutions récurrentes</h2>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="200" cy="110" r="80" fill="none" stroke="#B9862E" stroke-width="3" stroke-dasharray="6 6"/>
+      <circle cx="200" cy="30" r="34" fill="#1B3A5C"/><text x="200" y="35" text-anchor="middle" fill="#fff" font-family="Poppins" font-size="11">on: daily</text>
+      <circle cx="290" cy="150" r="34" fill="#2C5C8F"/><text x="290" y="155" text-anchor="middle" fill="#fff" font-family="Poppins" font-size="11">Agent</text>
+      <circle cx="110" cy="150" r="34" fill="#1E7A46"/><text x="110" y="155" text-anchor="middle" fill="#fff" font-family="Poppins" font-size="10">PR / issue</text>
+    </svg>
+  </div>
+  <p class="para">Une « loop » n'est pas un composant technique séparé, mais une <b>façon d'utiliser</b> les workflows agentiques : en remplaçant le déclencheur manuel par <code>on: daily</code> (ou hebdomadaire, ou sur un événement précis comme l'ouverture d'une issue), on obtient une exécution qui se répète automatiquement, sans aucune intervention humaine à chaque cycle. L'agent se réveille, exécute sa mission, puis attend le prochain déclenchement.</p>
+  <p class="para">Des cas d'usage concrets illustrent bien l'intérêt de ce mécanisme : un rapport d'état quotidien envoyé à l'équipe, un triage automatique des nouvelles issues selon leur priorité apparente, ou une synthèse hebdomadaire des pull requests restées trop longtemps en attente de revue.</p>
+  <div class="source">Source : GitHub Docs, « About GitHub agentic workflows » — docs.github.com/en/copilot/concepts/agents/about-github-agentic-workflows (consulté le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Quelle tâche répétitive de votre équipe mériterait un workflow en boucle quotidienne ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Communauté</div>
+  <h2 class="slide-title">awesome-copilot : le dépôt de référence</h2>
+  <ul class="points"><li>Dépôt communautaire officiel GitHub, organisé en <code>agents/</code>, <code>instructions/</code>, <code>skills/</code>, <code>plugins/</code>, <code>cookbook/</code>, <code>hooks/</code>, <code>workflows/</code>.</li><li>Fournit un <code>llms.txt</code> lisible par les IA, et un « Learning Hub » avec des guides.</li></ul>
+  <div class="codeblock">copilot plugin install <nom-du-plugin>@awesome-copilot</div>
+  <div class="source">Source : github.com/github/awesome-copilot (consulté le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Quelle catégorie de ce dépôt exploreriez-vous en premier pour TaskBoard ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Communauté</div>
+  <h2 class="slide-title">Cookbook : des recettes prêtes à copier-coller</h2>
+  <ul class="points"><li>Le dossier <code>cookbook/</code> d'awesome-copilot fournit des recettes concrètes pour travailler avec les API Copilot.</li><li>Intérêt pour un débutant : partir d'un exemple qui fonctionne déjà, plutôt que d'une page blanche.</li></ul>
+  <div class="source">Source : github.com/github/awesome-copilot (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Communauté</div>
+  <h2 class="slide-title">Extensions et agents tiers</h2>
+  <ul class="points"><li>Le dossier <code>extensions/</code> référence des intégrations tierces avec l'écosystème Copilot.</li><li>Il existe aussi des « third-party coding agents » documentés officiellement, à évaluer au cas par cas avant adoption en équipe.</li></ul>
+  <div class="source">Source : github.com/github/awesome-copilot ; GitHub Docs, « About third-party coding agents » (consultés le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Votre équipe a-t-elle déjà évalué un outil tiers connecté à Copilot ?</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Récap</div>
+  <h2 class="slide-title">Tout l'écosystème, en un schéma</h2>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 900 220" xmlns="http://www.w3.org/2000/svg">
+      <rect x="380" y="90" width="140" height="40" rx="8" fill="#1B3A5C"/><text x="450" y="115" text-anchor="middle" fill="#fff" font-family="Poppins" font-size="13">Copilot</text>
+      <g stroke="#B9862E" stroke-width="1.6" fill="none">
+        <line x1="380" y1="105" x2="130" y2="20"/><line x1="380" y1="110" x2="130" y2="70"/><line x1="380" y1="120" x2="130" y2="120"/><line x1="380" y1="128" x2="130" y2="170"/>
+        <line x1="520" y1="105" x2="770" y2="20"/><line x1="520" y1="110" x2="770" y2="70"/><line x1="520" y1="120" x2="770" y2="120"/><line x1="520" y1="128" x2="770" y2="170"/>
+      </g>
+      <g font-family="Poppins" font-size="11" fill="#2C5C8F">
+        <rect x="50" y="5" width="160" height="30" rx="6" fill="#E8EEF7" stroke="#2C5C8F"/><text x="130" y="24" text-anchor="middle">Agent mode</text>
+        <rect x="50" y="55" width="160" height="30" rx="6" fill="#E8EEF7" stroke="#2C5C8F"/><text x="130" y="74" text-anchor="middle">Cloud agent</text>
+        <rect x="50" y="105" width="160" height="30" rx="6" fill="#E8EEF7" stroke="#2C5C8F"/><text x="130" y="124" text-anchor="middle">Agents perso.</text>
+        <rect x="50" y="155" width="160" height="30" rx="6" fill="#E8EEF7" stroke="#2C5C8F"/><text x="130" y="174" text-anchor="middle">Sous-agents</text>
+        <rect x="690" y="5" width="160" height="30" rx="6" fill="#EAF6EE" stroke="#1E7A46"/><text x="770" y="24" text-anchor="middle" fill="#1E7A46">Skills</text>
+        <rect x="690" y="55" width="160" height="30" rx="6" fill="#EAF6EE" stroke="#1E7A46"/><text x="770" y="74" text-anchor="middle" fill="#1E7A46">Plugins</text>
+        <rect x="690" y="105" width="160" height="30" rx="6" fill="#EAF6EE" stroke="#1E7A46"/><text x="770" y="124" text-anchor="middle" fill="#1E7A46">MCP + Hooks</text>
+        <rect x="690" y="155" width="160" height="30" rx="6" fill="#EAF6EE" stroke="#1E7A46"/><text x="770" y="174" text-anchor="middle" fill="#1E7A46">Workflows / loops</text>
+      </g>
+    </svg>
+  </div>
+  <div class="question"><b>❓</b> Sur ce schéma, quel élément avez-vous déjà utilisé, même sans le savoir ?</div>
+</section>
+
+<section class="slide slide-divider">
+  <div class="section-tag">Personnalisation</div>
+  <h1 class="section-title">Configurer Copilot (doc officielle VS Code)</h1>
+  <p class="section-sub">Instructions, fichiers, paramètres — la syntaxe exacte.</p>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Instructions</div>
+  <h2 class="slide-title"><code>copilot-instructions.md</code> : à quoi ça sert</h2>
+  <p class="para">C'est le fichier d'instructions le plus simple et le plus puissant : toutes les règles qu'il contient sont lues <b>automatiquement</b> par Copilot, à chaque question posée sur le dépôt — dans le Chat, en Agent mode, et même par le Cloud agent. Vous n'avez rien à activer ni à mentionner : il suffit qu'il existe au bon endroit.</p>
+  <div class="note">Emplacement unique : à la racine du projet, dans <code>.github/copilot-instructions.md</code>. Il n'existe pas de version « profil utilisateur » de ce fichier précis — pour une règle personnelle valable sur tous vos projets, voir AGENTS.md ou CLAUDE.md plus loin.</div>
+  <div class="source">Source : VS Code Docs, « Custom instructions » — code.visualstudio.com/docs/agent-customization/custom-instructions (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Instructions</div>
+  <h2 class="slide-title"><code>copilot-instructions.md</code> : créer le vôtre, étape par étape</h2>
+  <ol class="exo-steps">
+    <li>À la racine de <code>codebase_taskboard/</code>, créez le dossier <code>.github/</code> s'il n'existe pas.</li>
+    <li>À l'intérieur, créez le fichier <code>copilot-instructions.md</code>.</li>
+    <li>Écrivez vos règles en Markdown libre — pas de frontmatter requis pour ce fichier.</li>
+    <li>Enregistrez. Posez n'importe quelle question sur le projet : le style de réponse doit déjà en tenir compte.</li>
+  </ol>
+  <div class="codeblock">.github/copilot-instructions.md
+
+# Copilot instructions — TaskBoard
+## Conventions
+- HTML5 sémantique, CSS pur, aucun JavaScript
+- Nommage des classes CSS : kebab-case (ex. card-title, form-panel)
+- Toutes les couleurs et espacements passent par css/variables.css
+## Contraintes
+- Ne jamais introduire de secret ou d'identifiant réel
+## Style de réponse
+- Code d'abord, explication courte ensuite</div>
+  <div class="source">Source : VS Code Docs, « Custom instructions » — code.visualstudio.com/docs/agent-customization/custom-instructions (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Instructions ciblées</div>
+  <h2 class="slide-title"><code>*.instructions.md</code> : à quoi ça sert</h2>
+  <p class="para">Contrairement à <code>copilot-instructions.md</code> (toujours actif partout), un fichier <code>*.instructions.md</code> ne s'applique <b>qu'aux fichiers qui correspondent à un motif précis</b>, grâce au champ <code>applyTo</code> de son en-tête. C'est le bon outil quand deux zones d'un même projet suivent des règles différentes — typiquement, un code ancien qu'on ne veut pas moderniser par erreur, face à un code récent qu'on veut faire évoluer librement.</p>
+  <div class="note">Deux emplacements possibles : dans le projet, <code>.github/instructions/</code> (partagé avec l'équipe) ; ou dans votre profil utilisateur, <code>~/.copilot/instructions/</code> (personnel, valable sur tous vos projets).</div>
+  <div class="source">Source : VS Code Docs, « Custom instructions » — code.visualstudio.com/docs/agent-customization/custom-instructions (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Instructions ciblées</div>
+  <h2 class="slide-title"><code>*.instructions.md</code> : créer le vôtre, étape par étape</h2>
+  <ol class="exo-steps">
+    <li>Créez le dossier <code>.github/instructions/</code> dans <code>codebase_taskboard/</code>.</li>
+    <li>Créez le fichier <code>legacy-css.instructions.md</code>.</li>
+    <li>En première ligne, ouvrez un bloc <code>---</code>, ajoutez <code>applyTo</code> avec le motif de fichiers concernés, fermez par <code>---</code>.</li>
+    <li>Écrivez la consigne, puis enregistrez.</li>
+  </ol>
+  <div class="codeblock">.github/instructions/legacy-css.instructions.md
+
+---
+applyTo: "css/legacy-styles.css"
+description: Conventions pour le CSS hérité
+---
+Ce fichier contient un ancien CSS. Ne proposez que des refactors
+qui gardent EXACTEMENT le même rendu visuel. N'ajoutez jamais de
+JavaScript, même pour "simplifier" une interaction.</div>
+  <div class="note"><code>applyTo: "**"</code> applique l'instruction à tout le dépôt — utile pour tester rapidement le mécanisme avant de le restreindre.</div>
+  <div class="source">Source : VS Code Docs, « Custom instructions » — code.visualstudio.com/docs/agent-customization/custom-instructions (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Instructions</div>
+  <h2 class="slide-title"><code>AGENTS.md</code> : pourquoi, où, comment</h2>
+  <p class="para"><b>Pourquoi ce fichier plutôt que <code>copilot-instructions.md</code> ?</b> <code>AGENTS.md</code> est un format ouvert, de plus en plus adopté par différents outils IA au-delà de Copilot — un même fichier peut donc servir à plusieurs assistants si votre équipe en utilise plusieurs. Sa différence essentielle avec <code>copilot-instructions.md</code> : il peut être <b>imbriqué</b>, c'est-à-dire présent aussi dans des sous-dossiers, chacun affinant les règles de sa propre zone (nécessite le paramètre <code>chat.useNestedAgentsMdFiles</code>).</p>
+  <ol class="exo-steps">
+    <li>Créez <code>AGENTS.md</code> à la racine de <code>codebase_taskboard/</code> avec les règles générales du projet.</li>
+    <li>Optionnel : créez un second <code>AGENTS.md</code> dans <code>css/</code>, avec une règle propre à ce dossier.</li>
+  </ol>
+  <div class="codeblock">css/AGENTS.md
+
+Ce dossier contient tous les styles du projet. legacy-styles.css est
+un code hérité, en attente de nettoyage. Toute proposition doit garder
+EXACTEMENT le même rendu visuel — aucun JavaScript, jamais.</div>
+  <div class="source">Source : VS Code Docs, « Custom instructions » — code.visualstudio.com/docs/agent-customization/custom-instructions (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Instructions</div>
+  <h2 class="slide-title"><code>CLAUDE.md</code> : pourquoi, où, comment</h2>
+  <p class="para"><b>Pourquoi ce fichier ?</b> Si votre équipe utilise déjà Claude Code ou un autre outil compatible avec ce standard en plus de Copilot, <code>CLAUDE.md</code> évite de dupliquer les mêmes règles dans deux fichiers différents — un seul fichier sert à tous les outils compatibles. Sa différence avec <code>*.instructions.md</code> : il n'a pas de ciblage par <code>applyTo</code>, il s'applique globalement au dépôt (ou à vous, en version personnelle).</p>
+  <table class="ref">
+    <tr><th>Emplacement</th><th>Portée</th></tr>
+    <tr><td>Racine du projet, <code>CLAUDE.md</code></td><td>Partagé avec toute l'équipe sur ce dépôt</td></tr>
+    <tr><td><code>.claude/CLAUDE.md</code></td><td>Partagé avec toute l'équipe, rangé à part</td></tr>
+    <tr><td><code>~/.claude/CLAUDE.md</code></td><td>Personnel, valable sur tous vos projets</td></tr>
+  </table>
+  <div class="source">Source : VS Code Docs, « Custom instructions » — code.visualstudio.com/docs/agent-customization/custom-instructions (consulté le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Votre équipe utilise-t-elle déjà, ou envisage-t-elle, un second outil IA en plus de Copilot ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Prompt files</div>
+  <h2 class="slide-title"><code>*.prompt.md</code> : créer un prompt réutilisable</h2>
+  <p class="para">Un prompt file encapsule une demande complète et réutilisable, invocable d'un simple <code>/nom-du-prompt</code> — utile pour une tâche que votre équipe répète souvent (revue de code standard, gabarit de nouveau composant).</p>
+  <ol class="exo-steps">
+    <li>Dans la vue Chat, icône ⚙️ « Configure Chat » → « New Prompt (Workspace) » (projet) ou « New Prompt (User) » (personnel).</li>
+    <li>Nommez le fichier — ce nom devient la commande slash.</li>
+    <li>Complétez le frontmatter et le corps du prompt.</li>
+  </ol>
+  <div class="codeblock">.github/prompts/code-review.prompt.md
+
+---
+description: Revue de code standard TaskBoard
+agent: ask
+tools: [read, search]
+---
+Analyse le diff fourni. Vérifie : conventions de nommage, absence de
+secrets, couverture de tests. Restitue une checklist avec un niveau
+de risque (faible / moyen / élevé).</div>
+  <div class="note">Emplacement projet : <code>.github/prompts/</code>. Emplacement personnel : dossier de profil VS Code, via le même menu. Invocation : tapez <code>/code-review</code> dans le chat.</div>
+  <div class="source">Source : VS Code Docs, « Prompt files » — code.visualstudio.com/docs/copilot/customization/prompt-files (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Paramètres VS Code</div>
+  <h2 class="slide-title">Les paramètres à connaître, prêts à coller</h2>
+  <p class="para">Ces réglages se collent dans <code>settings.json</code> (Command Palette → « Preferences: Open User Settings (JSON) »), ou pour un réglage de projet, dans <code>.vscode/settings.json</code>.</p>
+  <div class="codeblock">{
+  "chat.useAgentsMdFile": true,
+  "chat.useNestedAgentsMdFiles": true,
+  "chat.useClaudeMdFile": true,
+  "chat.includeApplyingInstructions": true,
+  "chat.instructionsFilesLocations": [".github/instructions"],
+  "github.copilot.chat.organizationInstructions.enabled": true
+}</div>
+  <table class="ref">
+    <tr><th>Paramètre</th><th>Rôle</th></tr>
+    <tr><td><code>chat.instructionsFilesLocations</code></td><td>Emplacements des dossiers d'instructions</td></tr>
+    <tr><td><code>chat.useAgentsMdFile</code></td><td>Active/désactive le support AGENTS.md</td></tr>
+    <tr><td><code>chat.useNestedAgentsMdFiles</code></td><td>Autorise des AGENTS.md par sous-dossier</td></tr>
+    <tr><td><code>chat.useClaudeMdFile</code></td><td>Active/désactive le support CLAUDE.md</td></tr>
+    <tr><td><code>chat.includeApplyingInstructions</code></td><td>Active les instructions ciblées par motif</td></tr>
+    <tr><td><code>github.copilot.chat.organizationInstructions.enabled</code></td><td>Active les instructions au niveau organisation</td></tr>
+  </table>
+  <div class="source">Source : VS Code Docs, « Custom instructions » — code.visualstudio.com/docs/agent-customization/custom-instructions (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Générer automatiquement</div>
+  <h2 class="slide-title">3 commandes pour générer vos instructions</h2>
+  <table class="ref">
+    <tr><th>Commande</th><th>Effet</th></tr>
+    <tr><td><code>/init</code></td><td>Analyse le projet et génère des instructions de base</td></tr>
+    <tr><td><code>/create-instruction</code></td><td>Génère un fichier d'instructions ciblé, avec l'aide de l'IA</td></tr>
+    <tr><td><code>/instructions</code></td><td>Ouvre le menu de configuration des instructions</td></tr>
+  </table>
+  <div class="codeblock">/init</div>
+  <div class="source">Source : VS Code Docs, « Custom instructions » — code.visualstudio.com/docs/agent-customization/custom-instructions (consulté le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Testeriez-vous <code>/init</code> directement sur TaskBoard cet après-midi ?</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Vue d'ensemble</div>
+  <h2 class="slide-title">Les couches d'instructions, empilées</h2>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 230" xmlns="http://www.w3.org/2000/svg">
+      <rect x="100" y="10" width="500" height="40" rx="6" fill="#1B3A5C"/><text x="350" y="35" text-anchor="middle" fill="#fff" font-family="Poppins" font-size="12">copilot-instructions.md — toujours actif, tout le dépôt</text>
+      <rect x="100" y="60" width="500" height="40" rx="6" fill="#2C5C8F"/><text x="350" y="85" text-anchor="middle" fill="#fff" font-family="Poppins" font-size="12">*.instructions.md + applyTo — actif si le fichier correspond</text>
+      <rect x="100" y="110" width="500" height="40" rx="6" fill="#B9862E"/><text x="350" y="135" text-anchor="middle" fill="#fff" font-family="Poppins" font-size="12">AGENTS.md — imbriqué, le plus proche du fichier gagne du détail</text>
+      <rect x="100" y="160" width="500" height="40" rx="6" fill="#1E7A46"/><text x="350" y="185" text-anchor="middle" fill="#fff" font-family="Poppins" font-size="12">CLAUDE.md — global au dépôt, multi-outils</text>
+    </svg>
+  </div>
+  <p class="para">Ces 4 couches ne s'excluent pas : elles se <b>combinent</b>. Si votre question porte sur <code>css/legacy-styles.css</code>, et que ce fichier est couvert à la fois par <code>copilot-instructions.md</code>, un <code>*.instructions.md</code> ciblé, et un <code>AGENTS.md</code> local à <code>css/</code>, Copilot lit les trois et en tient compte ensemble — il n'y a pas de « gagnant unique » qui écraserait les autres, contrairement à ce qu'on pourrait attendre d'un système de priorité classique.</p>
+  <div class="note">Bonne pratique : gardez <code>copilot-instructions.md</code> court et général ; réservez les règles très spécifiques aux fichiers ciblés (<code>*.instructions.md</code>, <code>AGENTS.md</code> imbriqué), pour éviter les contradictions entre couches.</div>
+  <div class="source">Source : VS Code Docs, « Custom instructions » — code.visualstudio.com/docs/agent-customization/custom-instructions (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Organisation</div>
+  <h2 class="slide-title">Instructions au niveau organisation</h2>
+  <p class="para">Au-dessus du dépôt, une organisation comme Transactis peut définir des instructions communes à <b>tous ses dépôts</b>, sans dépendre de chaque équipe pour les dupliquer partout. Cette couche s'active via le paramètre <code>github.copilot.chat.organizationInstructions.enabled</code>, et vient s'ajouter — pas remplacer — aux instructions de chaque projet individuel.</p>
+  <div class="source">Source : VS Code Docs, « Custom instructions » — code.visualstudio.com/docs/agent-customization/custom-instructions (consulté le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Quelle règle, commune à tous les projets Transactis, mériterait d'être définie une seule fois au niveau organisation ?</div>
+</section>
+
+<section class="slide slide-divider">
+  <div class="section-tag">Prompt engineering</div>
+  <h1 class="section-title">Bien formuler sa demande</h1>
+  <p class="section-sub">La compétence la plus rentable — écrire à Copilot, et écrire à Copilot Chat.</p>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Deux écritures, deux usages</div>
+  <h2 class="slide-title">Écrire à Copilot ≠ écrire à Copilot Chat</h2>
+  <p class="para">Il existe en réalité <b>deux façons distinctes</b> de « parler » à Copilot, et un développeur doit maîtriser les deux. La première est <b>l'écriture inline</b> : pendant que vous codez, Copilot lit le fichier ouvert (le code déjà présent, les commentaires, les noms de classes) comme un prompt implicite, et propose une suggestion en gris, sans aucune fenêtre de dialogue. La seconde est <b>Copilot Chat</b> : une vraie conversation, où vous rédigez une demande explicite, avec du texte, des commandes (<code>/explain</code>, <code>/fix</code>...) et des références de contexte (<code>#file</code>...).</p>
+  <table class="ref">
+    <tr><th></th><th>Écriture inline</th><th>Copilot Chat</th></tr>
+    <tr><td>Où</td><td>Directement dans le fichier de code</td><td>Fenêtre de conversation séparée</td></tr>
+    <tr><td>Le prompt</td><td>Le code et les commentaires déjà écrits</td><td>Une phrase ou une question explicite</td></tr>
+    <tr><td>La réponse</td><td>Une suggestion à accepter (Tab) ou refuser (Échap)</td><td>Une explication, un extrait, un dialogue possible</td></tr>
+    <tr><td>Bon réflexe</td><td>Un commentaire clair juste avant le code à générer</td><td>Les 4 ingrédients (slide suivante)</td></tr>
+  </table>
+  <div class="source">Source : GitHub Docs, « What is GitHub Copilot? » — docs.github.com/en/copilot/get-started/what-is-github-copilot (consulté le 19/07/2026).</div>
+  <div class="question"><b>❓</b> Aviez-vous déjà remarqué que vous « parliez » à Copilot même sans ouvrir le Chat ?</div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Écriture inline</div>
+  <h2 class="slide-title">Bien écrire un prompt inline, dans le code</h2>
+  <p class="para">Un commentaire précis, placé juste avant l'endroit où vous voulez du code, agit comme un prompt à part entière — c'est la technique la plus utilisée par les développeurs au quotidien, bien avant d'ouvrir le Chat.</p>
+  <div class="codeblock">&lt;!-- Carte de tâche : titre, badge de priorité en haut à droite,
+     description sur 2 lignes maximum, date d'échéance en bas --&gt;
+</div>
+  <ol class="exo-steps">
+    <li>Collez ce commentaire dans <code>index.html</code>, juste avant une balise <code>&lt;article class="card"&gt;</code> vide.</li>
+    <li>Appuyez sur Entrée, patientez une seconde : une suggestion grise doit apparaître.</li>
+    <li><code>Tab</code> pour accepter, <code>Échap</code> pour refuser, <code>Alt+]</code> pour voir une suggestion alternative.</li>
+  </ol>
+  <div class="note">Plus le commentaire est précis (structure, contraintes), plus la suggestion inline est directement utilisable — exactement le même principe que pour Copilot Chat.</div>
+  <div class="source">Source : GitHub Docs, « Best practices for using GitHub Copilot » — docs.github.com/en/copilot/using-github-copilot/best-practices-for-using-github-copilot (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Copilot Chat</div>
+  <h2 class="slide-title">Recette d'une bonne demande à Copilot Chat</h2>
+  <ul class="points"><li><b>Contexte</b> — <code>#file</code></li><li><b>Objectif</b> — précis, mesurable</li><li><b>Contrainte</b> — style, comportement à garder</li><li><b>Vérification</b> — demandez ce qui reste incertain</li></ul>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Exemple</div>
+  <h2 class="slide-title">Avant / après, dans Copilot Chat</h2>
+  <div class="two-col">
+    <div class="card"><h4>❌ Flou</h4><p>« Améliore mon code. »</p></div>
+    <div class="card"><h4>✅ Précis</h4><p>« #file:css/legacy-styles.css — Réécris avec les variables de css/variables.css, sans !important. Garde EXACTEMENT le même rendu visuel. »</p></div>
+  </div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Principes officiels</div>
+  <h2 class="slide-title">9 principes de prompt engineering</h2>
+  <table class="ref">
+    <tr><th>#</th><th>Principe</th></tr>
+    <tr><td>1</td><td>Du général au précis</td></tr>
+    <tr><td>2</td><td>Donnez des exemples</td></tr>
+    <tr><td>3</td><td>Découpez les tâches complexes</td></tr>
+    <tr><td>4</td><td>Éliminez le flou</td></tr>
+    <tr><td>5</td><td>Précisez les bibliothèques</td></tr>
+    <tr><td>6</td><td>Montrez le code pertinent</td></tr>
+    <tr><td>7</td><td>Itérez plutôt qu'abandonner</td></tr>
+    <tr><td>8</td><td>Gardez une conversation propre</td></tr>
+    <tr><td>9</td><td>Un bon code de base aide Copilot</td></tr>
+  </table>
+  <div class="source">Source : GitHub Docs, « Prompt engineering for GitHub Copilot » — docs.github.com/en/copilot/concepts/prompting/prompt-engineering (consulté le 19/07/2026).</div>
+</section>
+
+<section class="slide slide-exercice">
+  <div class="exo-tag">⚙️ Exercice éclair</div>
+  <h2 class="exo-title">Une demande complète, sur task-detail.html</h2>
+  <p class="para">Appliquez les 4 ingrédients vous-même, sur un fichier que vous n'avez pas encore ciblé aujourd'hui.</p>
+  <div class="codeblock">#file:task-detail.html
+Objectif : ajoute une section "Historique" sous les commentaires, avec
+2 entrées statiques (date + action).
+Contrainte : réutilise les classes déjà définies dans css/components.css,
+n'en crée aucune nouvelle.
+Vérification : signale si une classe existante ne convient pas exactement.</div>
+  <div class="question"><b>❓</b> Repérez les 4 ingrédients dans ce prompt : lequel a le plus influencé la réponse ?</div>
+</section>
+
+<section class="slide slide-exercice">
+  <div class="exo-tag">⚙️ Exercice éclair</div>
+  <h2 class="exo-title">Transformez une demande floue</h2>
+  <div class="codeblock">#file:css/legacy-styles.css
+améliore ce fichier</div>
+  <ol class="exo-steps">
+    <li>Collez d'abord ce prompt flou tel quel dans Copilot Chat et observez la réponse.</li>
+    <li>Réécrivez-le avec les 4 ingrédients (contexte déjà donné par <code>#file</code>, objectif précis, contrainte, vérification), collez la nouvelle version, et comparez les deux réponses.</li>
+  </ol>
+  <div class="question"><b>❓</b> Qui partage sa version, et la différence observée entre les deux réponses ?</div>
+</section>
+
+<section class="slide slide-divider">
+  <div class="section-tag">Sécurité</div>
+  <h1 class="section-title">Les règles à connaître</h1>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">3 règles</div>
+  <h2 class="slide-title">Les 3 règles d'or</h2>
+  <ul class="points"><li><b>1.</b> Vous restez responsable du code produit.</li><li><b>2.</b> Aucune donnée sensible soumise à l'IA.</li><li><b>3.</b> Toute proposition est relue par un humain.</li></ul>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Cas concret</div>
+  <h2 class="slide-title">Ce qu'il ne faut jamais coller</h2>
+  <div class="two-col">
+    <div class="card"><h4>❌</h4><p>Mot de passe, clé d'API, donnée client réelle.</p></div>
+    <div class="card"><h4>✅</h4><p>Code sans secret, données fictives comme TaskBoard.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Rôles</div>
+  <h2 class="slide-title">Qui est responsable de quoi ?</h2>
+  <ul class="points"><li><b>Vous</b> — formulez, relisez, décidez.</li><li><b>Le référent technique</b> — valide avant mise en production.</li><li><b>L'équipe sécurité</b> — définit les règles, reste le contact en cas de doute.</li></ul>
+  <div class="note">Copilot n'apparaît jamais dans cette liste : il assiste, il ne décide pas.</div>
+</section>
+
+<section class="slide slide-exercice">
+  <div class="exo-tag">⚙️ Exercice éclair</div>
+  <h2 class="exo-title">Checklist sécurité</h2>
+  <ol class="exo-steps"><li>Notez 3 données que vous ne soumettrez jamais à Copilot.</li></ol>
+</section>
+
+<section class="slide slide-divider">
+  <div class="section-tag">13h15-17h30</div>
+  <h1 class="section-title">Place à la pratique : TaskBoard</h1>
+  <p class="section-sub">10 étapes, 3 niveaux, un vrai projet HTML/CSS — sans une ligne de JavaScript.</p>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Le projet</div>
+  <h2 class="slide-title">TaskBoard, ce que vous allez manipuler</h2>
+  <ul class="points"><li>Un site HTML/CSS uniquement, sans build, sans installation — accessible même sans aucune notion de programmation.</li><li>12 fichiers : 3 pages HTML, 6 fichiers CSS dont un à améliorer, une documentation.</li></ul>
+  <div class="note">Ouvrez <code>codebase_taskboard/index.html</code> dans un navigateur pour démarrer.</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Cas concrets</div>
+  <h2 class="slide-title">3 usages typiques sur TaskBoard</h2>
+  <div class="three-col">
+    <div class="card"><h4>Comprendre</h4><p><code>#file:index.html</code> <code>/explain</code> — avant de toucher à quoi que ce soit.</p></div>
+    <div class="card"><h4>Améliorer</h4><p><code>#file:css/legacy-styles.css</code> <code>/fix</code> — rendre propre sans changer le rendu.</p></div>
+    <div class="card"><h4>Documenter</h4><p><code>#selection</code> <code>/doc</code> — préparer une revue humaine.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Arborescence</div>
+  <h2 class="slide-title">Les fichiers du projet</h2>
+  <div class="codeblock">index.html · task-detail.html · about.html
+css/variables.css · base.css · layout.css · components.css · responsive.css
+css/legacy-styles.css   ← à améliorer
+docs/architecture.md
+docs/checklist-accessibilite.md
+README.md</div>
+  <div class="note">Aucun fichier JavaScript dans ce projet — tout se passe en HTML et en CSS.</div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">3 niveaux</div>
+  <h2 class="slide-title">Comment fonctionne l'exercice</h2>
+  <div class="tier-row"><span class="tier beg">🟢 Facile</span><span class="tier mid">🟡 Intermédiaire</span><span class="tier pro">🔴 Pro</span></div>
+  <ul class="points"><li><b>🟢 Facile</b> — prompts prêts à recopier.</li><li><b>🟡 Intermédiaire</b> — prompts à adapter.</li><li><b>🔴 Pro</b> — périmètre libre, plugins et workflows inclus.</li></ul>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Aperçu</div>
+  <h2 class="slide-title">Les 10 étapes de l'exercice</h2>
+  <ul class="points"><li>1. Explorer · 2. Cibler avec #file/#selection · 3. Instructions de dépôt · 4. Améliorer le legacy · 5. Tests · 6. Documentation · 7. Agent mode · 8. Prompt file · 9. Agent personnalisé · 10. MCP/hooks/workflow (bonus pro)</li></ul>
+  <div class="question"><b>❓</b> Par quelle étape allez-vous commencer ?</div>
+</section>
+
+<section class="slide slide-exercice">
+  <div class="exo-tag">⚡ Mini-quiz éclair</div>
+  <h2 class="exo-title">Écosystème avancé — 3 questions</h2>
+  <ol class="exo-steps">
+    <li>Quelle est la différence entre Agent mode et Cloud agent ?</li>
+    <li>Dans quel fichier place-t-on les instructions toujours actives pour un dépôt ?</li>
+    <li>MCP est-il activé par défaut au niveau organisation ?</li>
+  </ol>
+</section>
+
+<section class="slide slide-divider">
+  <div class="section-tag">Synthèse</div>
+  <h1 class="section-title">Ce qu'il faut retenir</h1>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Vigilance</div>
+  <h2 class="slide-title">Erreurs fréquentes</h2>
+  <ul class="points"><li>Accepter sans lire. Question floue. Donnée sensible « juste cette fois ». <code>#codebase</code> par facilité. MCP activé sans gouvernance.</li></ul>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Lexique</div>
+  <h2 class="slide-title">Glossaire — 1/2</h2>
+  <div class="two-col">
+    <div class="card"><h4>AI Credit</h4><p>Unité de facturation, 1 credit = 0,01 $.</p></div>
+    <div class="card"><h4>Toolset</h4><p>Regroupement de fonctionnalités MCP activées explicitement.</p></div>
+    <div class="card"><h4>Agent mode</h4><p>Agent en direct, dans l'éditeur, supervisé.</p></div>
+    <div class="card"><h4>Cloud agent</h4><p>Agent autonome : recherche, plan, code, PR.</p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Lexique</div>
+  <h2 class="slide-title">Glossaire — 2/2</h2>
+  <div class="two-col">
+    <div class="card"><h4>Skill</h4><p>Compétence réutilisable (<code>SKILL.md</code>).</p></div>
+    <div class="card"><h4>Plugin</h4><p>Paquet regroupant agents, skills, hooks, MCP.</p></div>
+    <div class="card"><h4>applyTo</h4><p>Motif de fichiers ciblés par une instruction.</p></div>
+    <div class="card"><h4>Workflow agentique</h4><p>Automatisation en langage naturel, déclenchée par <code>on:</code>.</p></div>
+  </div>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Sources — 1/3</div>
+  <h2 class="slide-title">Sources GitHub Docs</h2>
+  <table class="ref">
+    <tr><th>Page</th><th>URL (docs.github.com)</th></tr>
+    <tr><td>What is GitHub Copilot?</td><td>/en/copilot/get-started/what-is-github-copilot</td></tr>
+    <tr><td>Chat cheat sheet</td><td>/en/copilot/reference/chat-cheat-sheet</td></tr>
+    <tr><td>Keyboard shortcuts</td><td>/en/copilot/reference/keyboard-shortcuts</td></tr>
+    <tr><td>Supported AI models</td><td>/en/copilot/reference/ai-models/supported-models</td></tr>
+    <tr><td>Prompt engineering</td><td>/en/copilot/concepts/prompting/prompt-engineering</td></tr>
+    <tr><td>Best practices</td><td>/en/copilot/using-github-copilot/best-practices-for-using-github-copilot</td></tr>
+  </table>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Sources — 2/3</div>
+  <h2 class="slide-title">Sources GitHub Docs (suite)</h2>
+  <table class="ref">
+    <tr><th>Page</th><th>URL (docs.github.com)</th></tr>
+    <tr><td>Usage-based billing (individuels)</td><td>/en/copilot/concepts/billing/usage-based-billing-for-individuals</td></tr>
+    <tr><td>Budgets for usage-based billing</td><td>/en/copilot/concepts/billing/budgets-for-usage-based-billing</td></tr>
+    <tr><td>Copilot requests</td><td>/en/copilot/concepts/billing/copilot-requests</td></tr>
+    <tr><td>About the Copilot cloud agent</td><td>/en/copilot/concepts/agents/cloud-agent</td></tr>
+    <tr><td>About plugins</td><td>/en/copilot/concepts/agents/about-plugins</td></tr>
+    <tr><td>Model Context Protocol (MCP)</td><td>/en/copilot/concepts/context/mcp</td></tr>
+    <tr><td>About GitHub agentic workflows</td><td>/en/copilot/concepts/agents/about-github-agentic-workflows</td></tr>
+  </table>
+</section>
+
+<section class="slide slide-ref">
+  <div class="slide-tag">Sources — 3/3</div>
+  <h2 class="slide-title">Sources VS Code Docs &amp; awesome-copilot</h2>
+  <table class="ref">
+    <tr><th>Source</th><th>URL</th></tr>
+    <tr><td>VS Code Docs, Custom instructions</td><td>code.visualstudio.com/docs/agent-customization/custom-instructions</td></tr>
+    <tr><td>awesome-copilot (dépôt communautaire)</td><td>github.com/github/awesome-copilot</td></tr>
+    <tr><td>Mastering GitHub Copilot for Paired Programming</td><td>github.com/microsoft/Mastering-GitHub-Copilot-for-Paired-Programming</td></tr>
+    <tr><td>Microsoft Learn, Decide which Copilot</td><td>learn.microsoft.com</td></tr>
+  </table>
+  <div class="note">Toutes ces pages ont été consultées le 19/07/2026. En cas de doute, la page officielle a toujours raison sur ce support.</div>
+</section>
+
+<section class="slide slide-exercice">
+  <div class="exo-tag">⚙️ Exercice éclair</div>
+  <h2 class="exo-title">Votre plan d'action</h2>
+  <ol class="exo-steps"><li>Un usage concret cette semaine.</li><li>Une règle de sécurité.</li><li>Un réflexe d'optimisation de tokens.</li></ol>
+</section>
+
+<section class="slide">
+  <div class="slide-tag">Points clés</div>
+  <h2 class="slide-title">Ce qu'il faut retenir</h2>
+  <div class="recap-grid">
+    <div class="recap-item"><div class="recap-num">01</div><p>1 AI Credit = 0,01 $ ; les complétions sont gratuites, le Chat/Agent coûte.</p></div>
+    <div class="recap-item"><div class="recap-num">02</div><p>Tokens de sortie ≈ 5x plus chers que les tokens d'entrée.</p></div>
+    <div class="recap-item"><div class="recap-num">03</div><p>Agent mode = supervisé ; Cloud agent = autonome (recherche/plan/code).</p></div>
+    <div class="recap-item"><div class="recap-num">04</div><p>Agents, skills, hooks, MCP se regroupent dans des plugins.</p></div>
+    <div class="recap-item"><div class="recap-num">05</div><p>copilot-instructions.md + *.instructions.md + AGENTS.md se combinent.</p></div>
+    <div class="recap-item"><div class="recap-num">06</div><p>Les workflows agentiques automatisent en langage naturel, y compris en boucle.</p></div>
+  </div>
+</section>
+
+<section class="slide slide-cta">
+  <h2>Merci.</h2>
+  <p>Des questions ? Contactez-moi directement.</p>
+  <div class="cta-links">
+    <a href="mailto:hello@dhcompany.pro">hello@dhcompany.pro</a>
+    <a href="https://dhcompany.pro">dhcompany.pro</a>
+    <a href="https://ia4africa.org">ia4africa.org</a>
+  </div>
+  <div class="cta-socials">@DigitalMaker237 sur LinkedIn &amp; X</div>
+</section>
+
+</div>
+
+<script>
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const progressBar = document.getElementById('progress');
+document.getElementById('counter').textContent = `1 / ${slides.length}`;
+
+function goTo(n) {
+  slides[current].classList.remove('active');
+  current = Math.max(0, Math.min(n, slides.length - 1));
+  slides[current].classList.add('active');
+  progressBar.style.width = ((current + 1) / slides.length * 100) + '%';
+  document.getElementById('counter').textContent = `${current + 1} / ${slides.length}`;
+  slides[current].scrollTop = 0;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(current - 1);
+});
+
+document.getElementById('nextBtn').addEventListener('click', () => goTo(current + 1));
+document.getElementById('prevBtn').addEventListener('click', () => goTo(current - 1));
+
+let xStart = null;
+document.addEventListener('touchstart', e => { xStart = e.changedTouches[0].screenX; });
+document.addEventListener('touchend', e => {
+  const diff = xStart - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 50) diff > 0 ? goTo(current + 1) : goTo(current - 1);
+});
+
+document.getElementById('exportPdfBtn').addEventListener('click', () => {
+  window.print();
+});
+
+goTo(0);
+</script>
+</body>
+</html>
